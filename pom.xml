@@ -1,0 +1,80 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<!--<parent>-->
+		<!--<groupId>com.cmbchina</groupId>-->
+		<!--<artifactId>yummy-master</artifactId>-->
+		<!--<version>0.0.1-SNAPSHOT</version>-->
+	<!--</parent>-->
+	<groupId>com.cmbchina</groupId>
+	<artifactId>cmbchina-activity-tran</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<!-- <packaging>pom</packaging> -->
+
+	<name>cmbchina-activity-tran</name>
+	<description>服务交易</description>
+
+	<!-- <modules>
+		<module>busi-acitivty</module>
+		<module>busi-lottery</module>
+		<module>busi-order</module>
+		<module>busi-product</module>
+		<module>busi-qualification</module>
+	</modules> -->
+
+	<dependencies>
+		<!-- <dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>yummy-dao-api</artifactId>
+		</dependency> -->
+		<!--<dependency>-->
+			<!--<groupId>${project.groupId}</groupId>-->
+			<!--<artifactId>yummy-dao-api</artifactId>-->
+		<!--</dependency>-->
+		<!--<dependency>-->
+			<!--<groupId>${project.groupId}</groupId>-->
+			<!--<artifactId>yummy-dao-service</artifactId>-->
+			<!--<scope>test</scope>-->
+		<!--</dependency>-->
+	</dependencies>
+
+	<build>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+			</testResource>
+		</testResources>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-antrun-plugin</artifactId>
+					<executions>
+						<execution>
+							<id>copyScriptsDubboLog</id>
+							<phase>generate-resources</phase>
+							<configuration>
+								<target>
+									<echo
+										message="---from scripts copy remote-db.properties,remote-jedis.properties start ---" />
+									<!--<copy todir="${basedir}/src/test/resources">-->
+										<!--<fileset dir="${global.resources.home}/${src.main.other}/db" />-->
+									<!--</copy>-->
+									<!--<copy todir="${basedir}/src/test/resources">-->
+										<!--<fileset dir="${global.resources.home}/${src.main.other}/redis" />-->
+									<!--</copy>-->
+									<echo
+										message="---from scripts copy remote-db.properties,remote-jedis.properties end ---" />
+								</target>
+							</configuration>
+							<goals>
+								<goal>run</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+</project>
