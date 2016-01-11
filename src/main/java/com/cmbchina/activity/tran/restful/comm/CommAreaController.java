@@ -22,4 +22,9 @@ public class CommAreaController {
     return null;
   }
 
+  @RequestMapping(value="greeting", method = RequestMethod.GET)
+  @ResponseBody
+  public String greeting(String name){
+    return "Hello, " + name;
+  }
 }
