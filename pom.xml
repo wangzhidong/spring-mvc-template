@@ -10,6 +10,7 @@
 
     <properties>
         <spring.version>4.1.6.RELEASE</spring.version>
+        <org-slf4j.version>1.7.12</org-slf4j.version>
     </properties>
 
     <dependencies>
@@ -42,6 +43,12 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
             <version>${spring.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${org-slf4j.version}</version>
         </dependency>
     </dependencies>
 </project>
