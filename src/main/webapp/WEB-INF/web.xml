@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:web="http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
 
-<web-app xmlns:web="http://xmlns.jcp.org/xml/ns/javaee">
     <display-name>cmbchina-activity-trans</display-name>
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
@@ -8,10 +8,10 @@
 
     <context-param>
         <param-name>contextConfigLocation</param-name>
-        <param-name>
+        <param-value>
             classpath*:conf/trans/spring/applicationContext-min.xml
             classpath*:conf/trans/spring/applicationContext-mvc.xml
-        </param-name>
+        </param-value>
     </context-param>
 
     <listener>

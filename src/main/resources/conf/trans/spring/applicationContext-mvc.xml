@@ -20,6 +20,8 @@
     </mvc:annotation-driven>
     <mvc:view-controller path="/" view-name="common/index" />
 
+    <!--<bean id="exceptionHandler" class="com.cmbchina.activity.tran.support.mvc.CommonExceptionHandler"/>-->
+
     <bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
         <property name="ignoreAcceptHeader" value="true" />
         <property name="defaultContentType" value="application/json" />
