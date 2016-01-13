@@ -13,18 +13,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 @Controller
 @RequestMapping(value="area")
-public class CommAreaController {
-  Logger log = LoggerFactory.getLogger(CommAreaController.class);
+public class CommonAreaController {
+  Logger log = LoggerFactory.getLogger(CommonAreaController.class);
 
   @RequestMapping(value = "listAreas", method = RequestMethod.POST)
   @ResponseBody
   public Object listAreas(@PathVariable(value="role") String role, int page, int limit){
     return null;
-  }
-
-  @RequestMapping(value="greeting", method = RequestMethod.GET)
-  @ResponseBody
-  public String greeting(String name){
-    return "Hello, " + name;
   }
 }

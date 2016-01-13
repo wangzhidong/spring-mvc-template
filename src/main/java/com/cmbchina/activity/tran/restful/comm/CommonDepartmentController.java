@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping(value="department")
-public class CommDepartmentController {
+public class CommonDepartmentController {
 
-  private static final Logger log = LoggerFactory.getLogger(CommDepartmentController.class);
+  private static final Logger log = LoggerFactory.getLogger(CommonDepartmentController.class);
 
   @RequestMapping(value="{role}/listDepartments", method = RequestMethod.POST)
   @ResponseBody
