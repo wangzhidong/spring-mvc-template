@@ -43,17 +43,4 @@ public class ActivityController {
     String commitUserName, Byte status){
     return null;
   }
-
-  @RequestMapping(value = "listTest", method = RequestMethod.GET)
-  @ResponseBody
-  public List<ActivityListResponse> listTest(){
-    ActivityListResponse resp1 = new ActivityListResponse();
-    resp1.setActGroupId("actg1111");
-    resp1.setQuaGroupId("quag1111");
-    ActivityListResponse resp2 = new ActivityListResponse();
-    resp2.setActGroupId("actg2222");
-    resp2.setQuaGroupId("quag2222");
-    List<ActivityListResponse> list = Lists.newArrayList(resp1, resp2);
-    return list;
-  }
 }
