@@ -48,4 +48,9 @@
         <!--</property>-->
     <!--</bean>-->
 
+    <bean class="com.cmbchina.activity.tran.restful.activity.op.controller.ActivityController" init-method="start">
+        <property name="activityService" ref="activityService" />
+        <!--<property name="anotherUserRestService" ref="anotherUserRestService" />-->
+    </bean>
+
 </beans>
