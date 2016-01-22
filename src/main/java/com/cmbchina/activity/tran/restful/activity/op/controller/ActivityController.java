@@ -1,7 +1,9 @@
 package com.cmbchina.activity.tran.restful.activity.op.controller;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.cmbchina.activity.busi.dto.ActivityRequest;
 import com.cmbchina.activity.busi.dto.ActivityResponse;
 import com.cmbchina.activity.busi.service.ActivityService;
 import com.cmbchina.activity.tran.restful.activity.op.vo.ActivityListResponse;
@@ -23,12 +25,13 @@ import java.util.List;
  */
 
 @Controller
-@RequestMapping(value = "activity")
+@RequestMapping(value = "activity/op")
 public class ActivityController {
 
   private static final Logger log = LoggerFactory.getLogger(ActivityController.class);
 
 //  @Autowired
+  @Reference
   private ActivityService activityService;
 
     public void setActivityService(ActivityService activityService){
@@ -48,15 +51,20 @@ public class ActivityController {
    * @param status
    * @return
    */
-  @RequestMapping(value = "listActivities", method = RequestMethod.POST)
+//  @RequestMapping(value = "listActivities", method = RequestMethod.POST)
+  @RequestMapping(value = "listActivities", method = RequestMethod.GET) // TODO GET for Test
   @ResponseBody
   public String listAcitivties(String userId, String roleId, String deptId,
     Date startTime, Date endTime, Date commitTimeStart, Date commitTimeEnd,
     String commitUserName, Byte status){
 
-//    ActivityService activityService = Consumer.singleton().getBean("helloService");
-    ActivityResponse response = activityService.queryActivity(null);
+    ActivityRequest request = new ActivityRequest();
+    request.setActivityId("111");
+    request.setActivityName("dubbox-->dubbox-demo-->com.alibaba.dubbo.demo.consumer.DemoActivityAction");
+
+    ActivityResponse response = activityService.queryActivity(request);
     String result = JSONObject.toJSONString(response);
     return result;
+//    return "null is null";
   }
 }

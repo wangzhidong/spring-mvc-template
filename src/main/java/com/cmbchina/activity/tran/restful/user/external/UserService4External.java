@@ -1,6 +1,6 @@
 package com.cmbchina.activity.tran.restful.user.external;
 
-import com.cmb.commons.bean.BusinessException;
+import com.cmbchina.commons.bean.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;

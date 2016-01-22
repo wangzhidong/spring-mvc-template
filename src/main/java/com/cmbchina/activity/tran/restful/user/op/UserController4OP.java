@@ -1,6 +1,6 @@
 package com.cmbchina.activity.tran.restful.user.op;
 
-import com.cmb.commons.bean.BusinessException;
+import com.cmbchina.commons.bean.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -20,7 +20,7 @@ public class UserController4OP {
 
   /**
    * 部门人员列表
-   * @param roleLi
+   * @param roleList
    * @param roleList
    * @param deptId
    * @param page

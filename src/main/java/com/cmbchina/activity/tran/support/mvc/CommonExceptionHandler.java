@@ -11,10 +11,11 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Created by wangtingbang on 16/1/12.
  */
-public class CommonExceptionHandler implements HandlerExceptionResolver{
+public class CommonExceptionHandler{// implements HandlerExceptionResolver{
 
   private static  final Logger log = LoggerFactory.getLogger(CommonExceptionHandler.class);
-  @Override public ModelAndView resolveException(HttpServletRequest request,
+//  @Override 
+  public ModelAndView resolveException(HttpServletRequest request,
     HttpServletResponse response, Object handler, Exception ex) {
     ModelAndView modelAndView = null;
     modelAndView = new ModelAndView("/common/index");
