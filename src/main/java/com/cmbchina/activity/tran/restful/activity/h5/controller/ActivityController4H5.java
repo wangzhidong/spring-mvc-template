@@ -1,7 +1,7 @@
 package com.cmbchina.activity.tran.restful.activity.h5.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.cmbchina.activity.busi.service.ActivityService;
+import com.cmbchina.activity.busi.act.service.ActivityService;
 import net.spy.memcached.compat.log.Logger;
 import net.spy.memcached.compat.log.LoggerFactory;
 import org.springframework.stereotype.Controller;
