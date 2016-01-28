@@ -15,7 +15,7 @@ import java.util.List;
  */
 
 @Controller
-@RequestMapping(value = "message")
+@RequestMapping(value = "common/message")
 public class MessageController {
 
   private static final Logger log = LoggerFactory.getLogger(MessageController.class);

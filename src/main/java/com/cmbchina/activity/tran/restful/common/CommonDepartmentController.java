@@ -1,4 +1,4 @@
-package com.cmbchina.activity.tran.restful.comm;
+package com.cmbchina.activity.tran.restful.common;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
