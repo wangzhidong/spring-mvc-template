@@ -19,8 +19,10 @@ public class CommonUserController {
 
   private static final Logger log = LoggerFactory.getLogger(CommonUserController.class);
 
-  public List listUsersByDept(String deptId, @RequestParam(value = "roleList[]") Byte[] roleList, int page, int limit) throws
-    BusinessException{
+  public List listUsersByDept(String deptId, @RequestParam(value = "roleList[]") Byte[] roleList,
+      int page, int limit) throws BusinessException {
     return null;
   }
+
+
 }

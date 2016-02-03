@@ -24,6 +24,7 @@
     <mvc:view-controller path="/" view-name="common/index" />
 
     <dubbo:annotation package="com.cmbchina.activity.tran.restful.activity.op.controller" />
+    <dubbo:annotation package="com.cmbchina.activity.tran.restful.activity.h5.controller" />
 
     <!--<bean id="exceptionHandler" class="com.cmbchina.activity.tran.support.mvc.CommonExceptionHandler"/>-->
 
@@ -43,19 +44,4 @@
         <property name="suffix" value=".jsp" />
         <property name="order" value="1" />
     </bean>
-
-
-
-    <!--<bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">-->
-        <!--<property name="formatters">-->
-            <!--<set>-->
-            <!--</set>-->
-        <!--</property>-->
-    <!--</bean>-->
-
-    <!--<bean class="com.cmbchina.activity.tran.restful.activity.op.controller.ActivityController" init-method="start">-->
-        <!--<property name="activityService" ref="activityService" />-->
-        <!--&lt;!&ndash;<property name="anotherUserRestService" ref="anotherUserRestService" />&ndash;&gt;-->
-    <!--</bean>-->
-
 </beans>
