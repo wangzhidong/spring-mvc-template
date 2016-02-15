@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.List;
+
 /**
  * Created by wangtingbang on 16/1/11.
  */
@@ -30,8 +32,9 @@ public class CommonDepartmentController {
 
   @RequestMapping(value="{role}/listDepartments", method = RequestMethod.POST)
   @ResponseBody
-  public Object listDepartments(@PathVariable("role") String role, int page, int limit ){
-    //TODO
-    return null;
+  public List listDepartments(@PathVariable("role") String role, int page, int limit ){
+    log.info("CommonDepartmentController.listDepartments call:{},{},{}", role, page, limit);
+    List result = comDepartmentService.listDepartments(page,limit);
+    return result;
   }
 }
