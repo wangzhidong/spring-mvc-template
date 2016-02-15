@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.List;
+
 /**
  * Created by wangtingbang on 16/1/11.
  */
@@ -22,12 +24,17 @@ public class CommonAreaController {
   private ComAreaService comAreaService;
 
   public void setAreaService(ComAreaService comAreaService){
+    if(log.isDebugEnabled()){
+      log.debug("CommonAreaController.comAreaService init-->{}", comAreaService);
+    }
     this.comAreaService = comAreaService;
   }
 
   @RequestMapping(value = "listAreas", method = RequestMethod.POST)
   @ResponseBody
-  public Object listAreas(@PathVariable(value="role") String role, int page, int limit){
-    return null;
+  public List listAreas(@PathVariable(value="role") String role, int page, int limit){
+    log.info("CommonAreaController.listAreas call:{}, {}, {}", role, page, limit);
+    List result = comAreaService.listAreas(page, limit);
+    return result;
   }
 }

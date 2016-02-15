@@ -11,4 +11,5 @@
 
     <dubbo:reference id="comAreaService" interface="com.cmbchina.activity.busi.common.service.ComAreaService"/>
 	<dubbo:reference id="comDepartmentService" interface="com.cmbchina.activity.busi.common.service.ComDepartmentService"/>
+	<dubbo:reference id="authorityService" interface="com.cmbchina.activity.busi.common.service.AuthorityService"/>
 </beans>

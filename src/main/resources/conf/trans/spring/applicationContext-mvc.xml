@@ -25,6 +25,7 @@
 
     <dubbo:annotation package="com.cmbchina.activity.tran.restful.activity.op.controller" />
     <dubbo:annotation package="com.cmbchina.activity.tran.restful.activity.h5.controller" />
+    <dubbo:annotation package="com.cmbchina.activity.tran.restful.user.auth.controller" />
 
     <!--<bean id="exceptionHandler" class="com.cmbchina.activity.tran.support.mvc.CommonExceptionHandler"/>-->
 
