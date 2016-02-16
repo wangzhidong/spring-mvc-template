@@ -59,9 +59,9 @@ public class ActivityController4OP {
     request.setActivityName("dubbox-->dubbox-demo-->com.alibaba.dubbo.demo.consumer.DemoActivityAction");
 
     //TODO
-    ActivityResponse response = activityService.queryActivity(request);
-    String result = JSONObject.toJSONString(response);
-    return result;
+    //ActivityResponse response = activityService.queryActivity(request);
+    //String result = JSONObject.toJSONString(response);
+    return null; //result;
   }
 
   /**
