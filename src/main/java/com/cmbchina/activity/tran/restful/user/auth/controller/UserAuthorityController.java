@@ -67,11 +67,12 @@ public class UserAuthorityController {
       UsernamePasswordToken token = new UsernamePasswordToken(loginName, password);
       // currentUser.login(token);
       String tokenString = JSONObject.toJSONString(token);
-      String aaa = String.format("%s-%s-%d", tokenString, request.getRemoteHost(), request.getRemotePort());
+      String aaa =
+          String.format("%s-%s-%d", tokenString, request.getRemoteHost(), request.getRemotePort());
       AuthUser authUser = new AuthUser();
       authUser.setLoginName(loginName);
       authUser.setPassword(password);
-//      authorityService.addUserToken(tokenString, authUser);
+      // authorityService.addUserToken(tokenString, authUser);
       authorityService.addUserToken(aaa, authUser);
 
       Map result = new HashMap<String, String>();
@@ -95,21 +96,22 @@ public class UserAuthorityController {
 
   @RequestMapping(value = "{key}/userLoginTest", method = RequestMethod.GET)
   @ResponseBody
-  public String userLoginTest(String userName, String password,HttpServletRequest request ){
+  public String userLoginTest(String userName, String password, HttpServletRequest request) {
 
     System.out.println("object========>>>>:\n\t" + (request));
     String method = request.getMethod();
     String remoteHost = request.getRemoteHost();
     int remotePort = request.getRemotePort();
-    System.out.printf("request method:%s, remoteHost:%s, remotePort:%d\n", method, remoteHost, remotePort);
+    System.out.printf("request method:%s, remoteHost:%s, remotePort:%d\n", method, remoteHost,
+        remotePort);
 
     Object object = RequestContextHolder.getRequestAttributes();
     System.out.println("object========>>>>:\n\t" + (object));
 
-//    HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder
-//      .getRequestAttributes()).getRequest();
-//
-//    System.out.println("http_request========>>>>:\n\t"+JSONObject.toJSONString(request));
+    // HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder
+    // .getRequestAttributes()).getRequest();
+    //
+    // System.out.println("http_request========>>>>:\n\t"+JSONObject.toJSONString(request));
     UserAuthRequest user = new UserAuthRequest();
     user.setLoginName(userName);
     user.setPassword(password);
@@ -126,8 +128,15 @@ public class UserAuthorityController {
 
   @RequestMapping(value = "{key}/userLogout", method = RequestMethod.GET)
   @ResponseBody
-  public String userLogout(String token){
-    int result = authorityService.removeUserToken(token);
-    return result >0 ? "success":"error";
+  public String userLogout(String token) {
+    int result = -1;
+    try {
+      result = authorityService.removeUserToken(token);
+    } catch (BusinessException e) {
+      e.printStackTrace();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return result > 0 ? "success" : "error";
   }
 }
