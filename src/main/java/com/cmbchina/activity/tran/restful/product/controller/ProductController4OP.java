@@ -45,16 +45,16 @@ public class ProductController4OP {
     AuthUser user = null;
     try {
       user = authorityService.getUserByUserId(userId);
+
+      if(user == null){
+        log.error("user not login:{}", userId);
+        return null;
+      }
     }catch (BusinessException e){
-      log.error("error:{}", e);
+      log.error("error:{}, {}", userId, e);
       return null;
     }catch (Exception e){
-      log.error("error:{}", e);
-      return null;
-    }
-
-    if(user == null){
-      log.error("user not login:{}", userId);
+      log.error("error:{}, {}", userId, e);
       return null;
     }
 
