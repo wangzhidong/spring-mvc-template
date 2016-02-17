@@ -1,5 +1,6 @@
-package com.cmbchina.activity.tran.restful.user.controller;
+package com.cmbchina.activity.tran.restful.common.controller;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.cmbchina.activity.busi.common.dto.AuthUser;
 import com.cmbchina.activity.busi.common.service.AuthorityService;
 import com.cmbchina.commons.bean.BusinessException;
@@ -18,11 +19,12 @@ import java.util.Map;
  * Created by wangtingbang on 16/1/13.
  */
 @Controller
-@RequestMapping(value = "user")
+@RequestMapping(value = "external/user")
 public class UserService4External {
 
   private static final Logger log = LoggerFactory.getLogger(UserService4External.class);
 
+  @Reference
   private AuthorityService authorityService;
 
 

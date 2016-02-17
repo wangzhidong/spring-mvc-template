@@ -4,7 +4,7 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.fastjson.JSONObject;
 import com.cmbchina.activity.busi.common.dto.AuthUser;
 import com.cmbchina.activity.busi.common.service.AuthorityService;
-import com.cmbchina.activity.tran.restful.user.auth.vo.UserAuthRequest;
+import com.cmbchina.activity.tran.restful.user.vo.UserAuthRequest;
 import com.cmbchina.commons.bean.BusinessException;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.LockedAccountException;
@@ -27,7 +27,7 @@ import java.util.Map;
  */
 
 @Controller
-@RequestMapping(value = "user/auth")
+@RequestMapping(value = "common/auth")
 public class UserAuthorityController {
 
   @Reference

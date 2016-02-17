@@ -1,5 +1,6 @@
 package com.cmbchina.activity.tran.restful.common.controller;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.cmbchina.activity.busi.common.service.ComDepartmentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,11 +17,12 @@ import java.util.List;
  */
 
 @Controller
-@RequestMapping(value="department")
+@RequestMapping(value="common/department")
 public class CommonDepartmentController {
 
   private static final Logger log = LoggerFactory.getLogger(CommonDepartmentController.class);
 
+  @Reference
   private ComDepartmentService comDepartmentService;
 
   public void setComDepartmentService(ComDepartmentService comDepartmentService){

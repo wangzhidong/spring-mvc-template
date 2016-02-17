@@ -20,6 +20,7 @@ import java.util.Map;
 @Controller
 @RequestMapping(value = "h5/activity")
 public class ActivityController4H5 {
+
   private static final Logger log = LoggerFactory.getLogger(ActivityController4H5.class);
 
   @Reference

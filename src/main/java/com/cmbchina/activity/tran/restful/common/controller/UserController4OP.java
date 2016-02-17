@@ -1,5 +1,7 @@
-package com.cmbchina.activity.tran.restful.user.controller;
+package com.cmbchina.activity.tran.restful.common.controller;
 
+import com.alibaba.dubbo.config.annotation.Reference;
+import com.cmbchina.activity.busi.common.service.ComUserService;
 import com.cmbchina.commons.bean.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,10 +15,17 @@ import java.util.List;
  */
 
 @Controller
-@RequestMapping(value="user")
+@RequestMapping(value="operation/user")
 public class UserController4OP {
 
   private static final Logger log = LoggerFactory.getLogger(UserController4OP.class);
+
+  @Reference
+  private ComUserService comUserService;
+
+  public void setComUserService(ComUserService comUserService){
+    this.comUserService = comUserService;
+  }
 
   /**
    * 部门人员列表

@@ -1,5 +1,6 @@
-package com.cmbchina.activity.tran.restful.user.controller;
+package com.cmbchina.activity.tran.restful.common.controller;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.cmbchina.activity.busi.common.dto.ComBusiContext;
 import com.cmbchina.activity.busi.common.dto.ComUser;
 import com.cmbchina.activity.busi.common.service.ComUserService;
@@ -23,11 +24,12 @@ import java.util.Map;
  */
 
 @Controller
-@RequestMapping(value = "user")
+@RequestMapping(value = "common/user")
 public class CommonUserController {
 
   private static final Logger log = LoggerFactory.getLogger(CommonUserController.class);
 
+  @Reference
   private ComUserService comUserService;
 
   public void setComUserService(ComUserService comUserService) {

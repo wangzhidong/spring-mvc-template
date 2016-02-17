@@ -16,7 +16,7 @@ import java.util.List;
  * Created by wangtingbang on 16/1/11.
  */
 @Controller
-@RequestMapping(value="area")
+@RequestMapping(value="common/area")
 public class CommonAreaController {
   Logger log = LoggerFactory.getLogger(CommonAreaController.class);
 
