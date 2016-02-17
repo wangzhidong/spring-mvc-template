@@ -10,18 +10,13 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.LockedAccountException;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.crypto.hash.Md5Hash;
-import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.RequestContextListener;
-import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.ModelAndView;
-import sun.security.rsa.RSASignature;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
@@ -94,6 +89,20 @@ public class UserAuthorityController {
     return new HashMap();
   }
 
+  @RequestMapping(value = "{key}/userLogout", method = RequestMethod.GET)
+  @ResponseBody
+  public String userLogout(String token) {
+    int result = -1;
+    try {
+      result = authorityService.removeUserToken(token);
+    } catch (BusinessException e) {
+      e.printStackTrace();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return result > 0 ? "success" : "error";
+  }
+
   @RequestMapping(value = "{key}/userLoginTest", method = RequestMethod.GET)
   @ResponseBody
   public String userLoginTest(String userName, String password, HttpServletRequest request) {
@@ -124,19 +133,5 @@ public class UserAuthorityController {
       e.printStackTrace();
     }
     return result;
-  }
-
-  @RequestMapping(value = "{key}/userLogout", method = RequestMethod.GET)
-  @ResponseBody
-  public String userLogout(String token) {
-    int result = -1;
-    try {
-      result = authorityService.removeUserToken(token);
-    } catch (BusinessException e) {
-      e.printStackTrace();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    return result > 0 ? "success" : "error";
   }
 }

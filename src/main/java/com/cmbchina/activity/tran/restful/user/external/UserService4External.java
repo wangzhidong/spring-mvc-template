@@ -6,7 +6,6 @@ import com.cmbchina.activity.busi.common.dto.ComUser;
 import com.cmbchina.activity.busi.common.service.AuthorityService;
 import com.cmbchina.activity.busi.common.service.ComUserService;
 import com.cmbchina.commons.bean.BusinessException;
-import com.cmbchina.commons.bean.CommonContext;
 import com.cmbchina.commons.util.DateTimeUtils;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
@@ -33,15 +32,11 @@ public class UserService4External {
 
   private AuthorityService authorityService;
 
-  private ComUserService comUserService;
 
   public void setAuthorityService(AuthorityService authorityService){
     this.authorityService = authorityService;
   }
 
-  public void setComUserService(ComUserService comUserService){
-    this.comUserService = comUserService;
-  }
 
   /**
    * 用户登录验证，主要面向资格平台
@@ -69,49 +64,4 @@ public class UserService4External {
     return result;
   }
 
-  /**
-   * 部门人员列表，主要面向资格平台
-   * @param page
-   * @param limit
-   * @param deptId
-   * @param roleList
-   * @param request
-     * @return
-     */
-  @RequestMapping(value = "listUsersByDept", method = RequestMethod.POST)
-  @ResponseBody
-  public List<Map> listUsersByDept(int page, int limit, String deptId, Byte[] roleList, HttpServletRequest request){
-
-    ComBusiContext commonContext = new ComBusiContext();
-    commonContext.setRequestSeqNo("EXTR"+DateTimeUtils.now()); //TODO seqNo-gen
-
-    /**
-     * TODO
-     */
-    String remoteAddr = request.getRemoteAddr();
-    String remoteHost = request.getRemoteHost();
-    String remoteUser = request.getRemoteUser();
-    String requestedSessionId = request.getRequestedSessionId();
-    Integer remotePort = request.getRemotePort();
-
-    List<Byte> role_s = Lists.newArrayList(roleList);
-
-    List<ComUser> users = comUserService.listUserByDept(commonContext, deptId, role_s, page, limit);
-
-    if(users == null || users.size() == 0){
-      return null;
-    }
-
-    List<Map> result = new ArrayList<Map>();
-    for(ComUser user: users){
-      Map<String, Object> map = new HashMap<String, Object>();
-      map.put("userId", user.getUserId());
-      map.put("userName",user.getUserName());
-      map.put("roleId", user.getRoleId());
-
-      result.add(map);
-    }
-
-    return result;
-  }
 }
