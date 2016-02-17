@@ -42,7 +42,7 @@ public class ProductController4OP {
 
   private List queryProductListByUserId(String userId, int page, int limit){
 
-    AuthUser user = null;
+    AuthUser user;
     try {
       user = authorityService.getUserByUserId(userId);
 
