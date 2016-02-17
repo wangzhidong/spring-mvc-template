@@ -1,4 +1,4 @@
-package com.cmbchina.activity.tran.restful.activity.op.vo;
+package com.cmbchina.activity.tran.restful.activity.vo;
 
 import java.util.Date;
 

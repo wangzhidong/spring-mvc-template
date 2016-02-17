@@ -1,4 +1,4 @@
-package com.cmbchina.activity.tran.restful.message;
+package com.cmbchina.activity.tran.restful.message.controller;
 
 import com.cmbchina.commons.bean.BusinessException;
 import org.slf4j.Logger;

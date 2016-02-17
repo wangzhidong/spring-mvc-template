@@ -1,4 +1,4 @@
-package com.cmbchina.activity.tran.restful.common;
+package com.cmbchina.activity.tran.restful.common.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.cmbchina.activity.busi.common.service.ComAreaService;
