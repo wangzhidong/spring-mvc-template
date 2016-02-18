@@ -11,6 +11,7 @@
         <param-value>
             classpath*/conf/trans/spring/dubbo-consumer-activity.xml
             classpath*/conf/trans/spring/dubbo-consumer-common.xml
+            classpath*/conf/trans/spring/dubbo-consumer-external.xml
             classpath*:conf/trans/spring/applicationContext-min.xml
             classpath*:conf/trans/spring/applicationContext-mvc.xml
         </param-value>

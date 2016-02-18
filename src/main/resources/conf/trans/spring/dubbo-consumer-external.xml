@@ -5,10 +5,11 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
 	http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
 
-    <dubbo:application name="demo-consumer" owner="programmer" organization="dubbox"/>
+    <dubbo:application name="external-consumer" owner="programmer" organization="dubbox"/>
 
     <!--<dubbo:registry address="zookeeper://127.0.0.1:2181"/>-->
 	<dubbo:registry address="zookeeper://192.168.20.159:2181"/>
 
-    <dubbo:reference id="activityService" interface="com.cmbchina.activity.busi.act.service.ActivityService"/>
+    <dubbo:reference id="externalQualificationService" interface="com.cmbchina.activity.busi.external.service.ExternalQualificationService"/>
+	<dubbo:reference id="externalProductService" interface="com.cmbchina.activity.busi.external.service.ExternalProductService"/>
 </beans>

@@ -17,8 +17,8 @@ http://www.springframework.org/schema/cache http://www.springframework.org/schem
        <!--<dubbo:application name="demo-consumer" owner="programmer" organization="dubbox"/>-->
        <dubbo:application name="busi-activity-service-provider" owner="O2O-developer" organization="cmbchina"/>
 
-       <dubbo:registry address="zookeeper://127.0.0.1:2181"/>
-       <!--<dubbo:registry address="zookeeper://192.168.20.225:2181"/>-->
+       <!--<dubbo:registry address="zookeeper://127.0.0.1:2181"/>-->
+       <dubbo:registry address="zookeeper://192.168.20.159:2181"/>
        <dubbo:protocol name="dubbo" serialization="kryo" />
 
        <dubbo:reference id="activityService" interface="com.cmbchina.activity.busi.act.service.ActivityService"/>

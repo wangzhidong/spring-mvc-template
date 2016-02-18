@@ -1,8 +1,10 @@
 package com.cmbchina.activity.tran.restful.activity.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.fastjson.JSONObject;
 import com.cmbchina.activity.busi.act.dto.ActActivity;
 import com.cmbchina.activity.busi.act.dto.ActivityRequest;
+import com.cmbchina.activity.busi.act.dto.ActivityResponse;
 import com.cmbchina.activity.busi.act.service.ActivityService;
 import net.spy.memcached.compat.log.Logger;
 import net.spy.memcached.compat.log.LoggerFactory;
@@ -57,8 +59,8 @@ public class ActivityController4OP {
     request.setActivityName("dubbox-->dubbox-demo-->com.alibaba.dubbo.demo.consumer.DemoActivityAction");
 
     //TODO
-    //ActivityResponse response = activityService.queryActivity(request);
-    //String result = JSONObject.toJSONString(response);
+    ActivityResponse response = activityService.queryActivity(request);
+    String result = JSONObject.toJSONString(response);
     return null; //result;
   }
 
