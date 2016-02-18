@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by wangtingbang on 16-2-17.
@@ -56,13 +58,34 @@ public class ProductController4H5 {
 
   /**
    *
-   * @param userId
+   * @param customerId
    * @return
    */
   @RequestMapping(value = "getUserProductList", method = RequestMethod.POST)
   @ResponseBody
-  public List getCustomerProductList(String userId){
-    return null;
+  public List getCustomerProductList(String customerId){
+
+    List products;
+    try {
+      products = customerService.getUserProductList(customerId);
+
+      if(products == null || products.size() == 0){
+        log.info("no product for customer: {}", customerId);
+        return null;
+      }
+    }catch(BusinessException e){
+      log.error("error:{}, {}", customerId, e);
+      return null;
+    }catch (Exception e){
+      log.error("error:{}, {}", customerId, e);
+      return null;
+    }
+    List<Map> result = new ArrayList<Map>();
+    //TODO
+    for(Object product:products){
+
+    }
+    return result;
   }
 
 }
