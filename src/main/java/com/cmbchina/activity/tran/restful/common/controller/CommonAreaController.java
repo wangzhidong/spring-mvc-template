@@ -23,13 +23,6 @@ public class CommonAreaController {
   @Autowired
   private ComAreaService comAreaService;
 
-//  public void setAreaService(ComAreaService comAreaService){
-//    if(log.isDebugEnabled()){
-//      log.debug("CommonAreaController.comAreaService init-->{}", comAreaService);
-//    }
-//    this.comAreaService = comAreaService;
-//  }
-
   @RequestMapping(value = "listAreas", method = RequestMethod.POST)
   @ResponseBody
   public List listAreas(@PathVariable(value="role") String role, int page, int limit){

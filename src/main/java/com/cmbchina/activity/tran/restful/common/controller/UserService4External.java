@@ -19,19 +19,13 @@ import java.util.Map;
  * Created by wangtingbang on 16/1/13.
  */
 @Controller
-@RequestMapping(value = "external/user")
+@RequestMapping(value = "external/auth")
 public class UserService4External {
 
   private static final Logger log = LoggerFactory.getLogger(UserService4External.class);
 
   @Autowired
   private AuthorityService authorityService;
-
-
-//  public void setAuthorityService(AuthorityService authorityService){
-//    this.authorityService = authorityService;
-//  }
-
 
   /**
    * 用户登录验证，主要面向资格平台

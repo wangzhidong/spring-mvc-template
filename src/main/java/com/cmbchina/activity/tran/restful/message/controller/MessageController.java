@@ -29,11 +29,8 @@ public class MessageController {
   @Autowired
   private ComMessageService comMessageService;
 
-//  public void setComMessageService(ComMessageService comMessageService){
-//    this.comMessageService = comMessageService;
-//  }
-
-  @RequestMapping(value = "getUserNotice", method = RequestMethod.POST)
+//  @RequestMapping(value = "getUserNotice", method = RequestMethod.POST)
+  @RequestMapping(value = "getUserNotice", method = RequestMethod.GET)
   @ResponseBody
   public List<Object> getUserNotice(String userId, HttpServletRequest request)throws BusinessException{
     ComBusiContext context = new ComBusiContext();

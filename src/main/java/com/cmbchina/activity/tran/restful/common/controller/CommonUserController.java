@@ -24,23 +24,13 @@ import java.util.Map;
  */
 
 @Controller
-@RequestMapping(value = "common/user")
+@RequestMapping(value = "common/auth")
 public class CommonUserController {
 
   private static final Logger log = LoggerFactory.getLogger(CommonUserController.class);
 
   @Autowired
   private ComUserService comUserService;
-
-//  public void setComUserService(ComUserService comUserService) {
-//    this.comUserService = comUserService;
-//  }
-
-  // public List listUsersByDept(String deptId, @RequestParam(value = "roleList[]") Byte[] roleList,
-  // int page, int limit) throws BusinessException {
-  // return null;
-  // }
-
 
   /**
    * 部门人员列表，主要面向资格平台

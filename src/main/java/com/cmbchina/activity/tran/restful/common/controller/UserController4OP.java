@@ -15,17 +15,13 @@ import java.util.List;
  */
 
 @Controller
-@RequestMapping(value="operation/user")
+@RequestMapping(value="operation/auth")
 public class UserController4OP {
 
   private static final Logger log = LoggerFactory.getLogger(UserController4OP.class);
 
   @Autowired
   private ComUserService comUserService;
-
-//  public void setComUserService(ComUserService comUserService){
-//    this.comUserService = comUserService;
-//  }
 
   /**
    * 部门人员列表

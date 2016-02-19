@@ -1,10 +1,9 @@
-package com.cmbchina.activity.tran.restful.user.controller;
+package com.cmbchina.activity.tran.restful.auth.controller;
 
-import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.fastjson.JSONObject;
 import com.cmbchina.activity.busi.common.dto.AuthUser;
 import com.cmbchina.activity.busi.common.service.AuthorityService;
-import com.cmbchina.activity.tran.restful.user.vo.UserAuthRequest;
+import com.cmbchina.activity.tran.restful.auth.vo.UserAuthRequest;
 import com.cmbchina.commons.bean.BusinessException;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.LockedAccountException;
@@ -33,10 +32,6 @@ public class UserAuthorityController {
 
   @Autowired
   private AuthorityService authorityService;
-
-//  public void setAuthorityService(AuthorityService authorityService) {
-//    this.authorityService = authorityService;
-//  }
 
   @RequestMapping(value = "{key}/login", method = RequestMethod.GET)
   public ModelAndView userLogin(@PathVariable("key") String key, String userName, String password) {

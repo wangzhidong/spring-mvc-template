@@ -1,7 +1,9 @@
 package com.cmbchina.activity.tran.restful.activity.controller;
 
+import java.util.List;
 import java.util.Map;
 
+import com.cmbchina.activity.busi.act.dto.ActGroup;
 import net.spy.memcached.compat.log.Logger;
 import net.spy.memcached.compat.log.LoggerFactory;
 
@@ -28,11 +30,6 @@ public class ActivityController4H5 {
   @Autowired
   private ActivityService activityService;
 
-//  public void setActivityService(ActivityService activityService) {
-//    this.activityService = activityService;
-//  }
-
-
   /**
    * @param areaCode
    * @param channel
@@ -40,19 +37,19 @@ public class ActivityController4H5 {
    */
   @RequestMapping(value = "listActivities4H5", method = RequestMethod.GET)//{RequestMethod.GET, RequestMethod.POST})
   @ResponseBody
-  public String listActivities4H5(String areaCode, Byte channel) {
+  public Object listActivities4H5(String areaCode, Byte channel) {
     ActBusiContext context = new ActBusiContext();
     String reqSeqNo = KeyGenerator.RegularPrefixIDGenerator.Id("AC4H5-LA4H5-");//类名缩写-方法名缩写,TODO
     context.setRequestSeqNo(reqSeqNo);
+
     try {
-//      List<ActGroup> groups = activityService.listActivityGroups(context, areaCode, channel);
       Map groups = activityService.listActivityGroups(context, areaCode, channel);
-      return com.alibaba.fastjson.JSONObject.toJSONString(groups);
-//      return groups;
+//      return com.alibaba.fastjson.JSONObject.toJSONString(groups);
+      return groups;
     } catch (BusinessException e) {
       log.error("error:", e);
+      return null;
     }
-    return null;
   }
 
   /**

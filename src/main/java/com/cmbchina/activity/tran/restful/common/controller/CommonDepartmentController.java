@@ -25,13 +25,6 @@ public class CommonDepartmentController {
   @Autowired
   private ComDepartmentService comDepartmentService;
 
-//  public void setComDepartmentService(ComDepartmentService comDepartmentService){
-//    if(log.isDebugEnabled()){
-//      log.debug("CommonDepartmentController.comDepartmentService init-->{}",comDepartmentService);
-//    }
-//    this.comDepartmentService = comDepartmentService;
-//  }
-
   @RequestMapping(value="{role}/listDepartments", method = RequestMethod.POST)
   @ResponseBody
   public List listDepartments(@PathVariable("role") String role, int page, int limit ){

@@ -43,7 +43,7 @@ public class ProductController4H5 {
     try {
       user = authorityService.getUserByUserId(userId);
       if(user == null){
-        log.error("user not login:{}", userId);
+        log.error("auth not login:{}", userId);
         return null;
       }
     }catch (BusinessException e){

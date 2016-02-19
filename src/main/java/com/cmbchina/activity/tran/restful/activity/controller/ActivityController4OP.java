@@ -31,10 +31,6 @@ public class ActivityController4OP {
   @Autowired
   private ActivityService activityService;
 
-//  public void setActivityService(ActivityService activityService){
-//    this.activityService = activityService;
-//  }
-
   /**
    * 活动列表
    * URL: listActivities
@@ -49,7 +45,6 @@ public class ActivityController4OP {
    * @param status
    * @return
    */
-//  @RequestMapping(value = "listActivities", method = RequestMethod.POST)
   @RequestMapping(value = "listActivities", method = RequestMethod.GET) // TODO GET for Test
   @ResponseBody
   public String listAcitivties(String userId, String roleId, String deptId,
