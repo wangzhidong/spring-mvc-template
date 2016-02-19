@@ -1,6 +1,5 @@
 package com.cmbchina.activity.tran.restful.product.controller;
 
-import com.alibaba.dubbo.config.annotation.Reference;
 import com.cmbchina.activity.busi.common.dto.AuthUser;
 import com.cmbchina.activity.busi.common.service.AuthorityService;
 import com.cmbchina.activity.busi.external.dto.ExternalProduct;
@@ -8,6 +7,7 @@ import com.cmbchina.activity.busi.external.service.ExternalProductService;
 import com.cmbchina.commons.bean.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -26,19 +26,19 @@ import java.util.Map;
 public class ProductController4OP {
   private static final Logger log = LoggerFactory.getLogger(ProductController4OP.class);
 
-  @Reference
+  @Autowired
   private ExternalProductService externalProductService;
 
-  @Reference
+  @Autowired
   private AuthorityService authorityService;
 
-  public void setExternalProductService(ExternalProductService externalProductService){
-    this.externalProductService = externalProductService;
-  }
+//  public void setExternalProductService(ExternalProductService externalProductService){
+//    this.externalProductService = externalProductService;
+//  }
 
-  public void setAuthorityService(AuthorityService authorityService){
-    this.authorityService = authorityService;
-  }
+//  public void setAuthorityService(AuthorityService authorityService){
+//    this.authorityService = authorityService;
+//  }
 
   private List queryProductListByUserId(String userId, int page, int limit){
 

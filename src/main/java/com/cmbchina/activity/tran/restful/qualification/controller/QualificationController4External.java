@@ -4,6 +4,7 @@ import com.cmbchina.activity.busi.common.dto.ComBusiContext;
 import com.cmbchina.activity.busi.external.service.ExternalQualificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -21,11 +22,12 @@ public class QualificationController4External {
 
   private static final Logger log = LoggerFactory.getLogger(QualificationController4External.class);
 
+  @Autowired
   private ExternalQualificationService externalQualificationService;
 
-  public void setExternalQualificationService(ExternalQualificationService externalQualificationService){
-    this.externalQualificationService = externalQualificationService;
-  }
+//  public void setExternalQualificationService(ExternalQualificationService externalQualificationService){
+//    this.externalQualificationService = externalQualificationService;
+//  }
 
   @RequestMapping(value = "listAvailableQualifications", method = RequestMethod.POST)
   @ResponseBody

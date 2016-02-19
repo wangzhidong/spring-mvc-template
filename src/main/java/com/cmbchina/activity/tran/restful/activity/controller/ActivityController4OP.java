@@ -1,20 +1,22 @@
 package com.cmbchina.activity.tran.restful.activity.controller;
 
-import com.alibaba.dubbo.config.annotation.Reference;
-import com.alibaba.fastjson.JSONObject;
-import com.cmbchina.activity.busi.act.dto.ActActivity;
-import com.cmbchina.activity.busi.act.dto.ActivityRequest;
-import com.cmbchina.activity.busi.act.dto.ActivityResponse;
-import com.cmbchina.activity.busi.act.service.ActivityService;
+import java.util.Date;
+import java.util.List;
+
 import net.spy.memcached.compat.log.Logger;
 import net.spy.memcached.compat.log.LoggerFactory;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.Date;
-import java.util.List;
+import com.alibaba.fastjson.JSONObject;
+import com.cmbchina.activity.busi.act.dto.ActActivity;
+import com.cmbchina.activity.busi.act.dto.ActivityRequest;
+import com.cmbchina.activity.busi.act.dto.ActivityResponse;
+import com.cmbchina.activity.busi.act.service.ActivityService;
 
 /**
  * Created by wangtingbang on 16/1/13.
@@ -26,12 +28,12 @@ public class ActivityController4OP {
 
   private static final Logger log = LoggerFactory.getLogger(ActivityController4OP.class);
 
-  @Reference
+  @Autowired
   private ActivityService activityService;
 
-  public void setActivityService(ActivityService activityService){
-    this.activityService = activityService;
-  }
+//  public void setActivityService(ActivityService activityService){
+//    this.activityService = activityService;
+//  }
 
   /**
    * 活动列表
@@ -61,7 +63,7 @@ public class ActivityController4OP {
     //TODO
     ActivityResponse response = activityService.queryActivity(request);
     String result = JSONObject.toJSONString(response);
-    return null; //result;
+    return result;
   }
 
   /**

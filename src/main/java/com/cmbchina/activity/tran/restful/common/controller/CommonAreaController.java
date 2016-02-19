@@ -1,9 +1,9 @@
 package com.cmbchina.activity.tran.restful.common.controller;
 
-import com.alibaba.dubbo.config.annotation.Reference;
 import com.cmbchina.activity.busi.common.service.ComAreaService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,15 +20,15 @@ import java.util.List;
 public class CommonAreaController {
   Logger log = LoggerFactory.getLogger(CommonAreaController.class);
 
-  @Reference
+  @Autowired
   private ComAreaService comAreaService;
 
-  public void setAreaService(ComAreaService comAreaService){
-    if(log.isDebugEnabled()){
-      log.debug("CommonAreaController.comAreaService init-->{}", comAreaService);
-    }
-    this.comAreaService = comAreaService;
-  }
+//  public void setAreaService(ComAreaService comAreaService){
+//    if(log.isDebugEnabled()){
+//      log.debug("CommonAreaController.comAreaService init-->{}", comAreaService);
+//    }
+//    this.comAreaService = comAreaService;
+//  }
 
   @RequestMapping(value = "listAreas", method = RequestMethod.POST)
   @ResponseBody

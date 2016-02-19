@@ -10,6 +10,7 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.LockedAccountException;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,12 +31,12 @@ import java.util.Map;
 @RequestMapping(value = "common/auth")
 public class UserAuthorityController {
 
-  @Reference
+  @Autowired
   private AuthorityService authorityService;
 
-  public void setAuthorityService(AuthorityService authorityService) {
-    this.authorityService = authorityService;
-  }
+//  public void setAuthorityService(AuthorityService authorityService) {
+//    this.authorityService = authorityService;
+//  }
 
   @RequestMapping(value = "{key}/login", method = RequestMethod.GET)
   public ModelAndView userLogin(@PathVariable("key") String key, String userName, String password) {

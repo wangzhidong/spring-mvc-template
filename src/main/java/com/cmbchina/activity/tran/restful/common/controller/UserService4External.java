@@ -1,11 +1,11 @@
 package com.cmbchina.activity.tran.restful.common.controller;
 
-import com.alibaba.dubbo.config.annotation.Reference;
 import com.cmbchina.activity.busi.common.dto.AuthUser;
 import com.cmbchina.activity.busi.common.service.AuthorityService;
 import com.cmbchina.commons.bean.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -24,13 +24,13 @@ public class UserService4External {
 
   private static final Logger log = LoggerFactory.getLogger(UserService4External.class);
 
-  @Reference
+  @Autowired
   private AuthorityService authorityService;
 
 
-  public void setAuthorityService(AuthorityService authorityService){
-    this.authorityService = authorityService;
-  }
+//  public void setAuthorityService(AuthorityService authorityService){
+//    this.authorityService = authorityService;
+//  }
 
 
   /**

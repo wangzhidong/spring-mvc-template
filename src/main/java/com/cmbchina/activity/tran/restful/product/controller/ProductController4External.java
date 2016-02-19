@@ -1,12 +1,12 @@
 package com.cmbchina.activity.tran.restful.product.controller;
 
-import com.alibaba.dubbo.config.annotation.Reference;
 import com.cmbchina.activity.busi.act.dto.ActBusiContext;
 import com.cmbchina.activity.busi.act.service.ActivityService;
 import com.cmbchina.commons.bean.BusinessException;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -24,12 +24,12 @@ public class ProductController4External {
 
   private static final Logger log = LoggerFactory.getLogger(ProductController4External.class);
 
-  @Reference
+  @Autowired
   private ActivityService activityService;
 
-  public void setActivityService(ActivityService activityService){
-    this.activityService = activityService;
-  }
+//  public void setActivityService(ActivityService activityService){
+//    this.activityService = activityService;
+//  }
 
 
   /**

@@ -1,6 +1,5 @@
 package com.cmbchina.activity.tran.restful.message.controller;
 
-import com.alibaba.dubbo.config.annotation.Reference;
 import com.cmbchina.activity.busi.common.dto.ComBusiContext;
 import com.cmbchina.activity.busi.common.dto.ComMessage;
 import com.cmbchina.activity.busi.common.service.ComMessageService;
@@ -8,6 +7,7 @@ import com.cmbchina.commons.bean.BusinessException;
 import com.cmbchina.commons.util.DateTimeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -26,12 +26,12 @@ public class MessageController {
 
   private static final Logger log = LoggerFactory.getLogger(MessageController.class);
 
-  @Reference
+  @Autowired
   private ComMessageService comMessageService;
 
-  public void setComMessageService(ComMessageService comMessageService){
-    this.comMessageService = comMessageService;
-  }
+//  public void setComMessageService(ComMessageService comMessageService){
+//    this.comMessageService = comMessageService;
+//  }
 
   @RequestMapping(value = "getUserNotice", method = RequestMethod.POST)
   @ResponseBody

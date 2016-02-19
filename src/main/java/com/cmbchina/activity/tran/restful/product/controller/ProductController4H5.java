@@ -1,12 +1,12 @@
 package com.cmbchina.activity.tran.restful.product.controller;
 
-import com.alibaba.dubbo.config.annotation.Reference;
 import com.cmbchina.activity.busi.common.dto.AuthUser;
 import com.cmbchina.activity.busi.common.service.AuthorityService;
 import com.cmbchina.activity.busi.common.service.CustomerService;
 import com.cmbchina.commons.bean.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -24,19 +24,19 @@ import java.util.Map;
 public class ProductController4H5 {
   private static final Logger log = LoggerFactory.getLogger(ProductController4H5.class);
 
-  @Reference
+  @Autowired
   private CustomerService customerService;
 
-  @Reference
+  @Autowired
   private AuthorityService authorityService;
 
-  public void setCustomerService(CustomerService customerService){
-    this.customerService = customerService;
-  }
+//  public void setCustomerService(CustomerService customerService){
+//    this.customerService = customerService;
+//  }
 
-  public void setAuthorityService(AuthorityService authorityService){
-    this.authorityService = authorityService;
-  }
+//  public void setAuthorityService(AuthorityService authorityService){
+//    this.authorityService = authorityService;
+//  }
 
   private AuthUser getUserById(String userId){
     AuthUser user = null;

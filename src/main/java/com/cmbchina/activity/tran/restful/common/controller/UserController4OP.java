@@ -1,10 +1,10 @@
 package com.cmbchina.activity.tran.restful.common.controller;
 
-import com.alibaba.dubbo.config.annotation.Reference;
 import com.cmbchina.activity.busi.common.service.ComUserService;
 import com.cmbchina.commons.bean.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,12 +20,12 @@ public class UserController4OP {
 
   private static final Logger log = LoggerFactory.getLogger(UserController4OP.class);
 
-  @Reference
+  @Autowired
   private ComUserService comUserService;
 
-  public void setComUserService(ComUserService comUserService){
-    this.comUserService = comUserService;
-  }
+//  public void setComUserService(ComUserService comUserService){
+//    this.comUserService = comUserService;
+//  }
 
   /**
    * 部门人员列表
