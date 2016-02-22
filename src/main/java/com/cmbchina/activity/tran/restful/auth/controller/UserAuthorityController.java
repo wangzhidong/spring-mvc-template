@@ -2,9 +2,12 @@ package com.cmbchina.activity.tran.restful.auth.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.cmbchina.activity.busi.common.dto.AuthUser;
+import com.cmbchina.activity.busi.common.dto.ComUser;
 import com.cmbchina.activity.busi.common.service.AuthorityService;
+import com.cmbchina.activity.busi.common.service.ComUserService;
 import com.cmbchina.activity.tran.restful.auth.vo.UserAuthRequest;
 import com.cmbchina.commons.bean.BusinessException;
+import com.cmbchina.commons.util.DateTimeUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.LockedAccountException;
 import org.apache.shiro.authc.UnknownAccountException;
@@ -19,6 +22,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,6 +37,9 @@ public class UserAuthorityController {
   @Autowired
   private AuthorityService authorityService;
 
+  @Autowired
+  private ComUserService comUserService;
+
   @RequestMapping(value = "{key}/login", method = RequestMethod.GET)
   public ModelAndView userLogin(@PathVariable("key") String key, String userName, String password) {
     ModelAndView mav = new ModelAndView();
@@ -44,15 +51,12 @@ public class UserAuthorityController {
   @ResponseBody
   public Map userLogin(UserAuthRequest user, HttpServletRequest request) throws BusinessException {
 
-    // Subject currentUser = SecurityUtils.getSubject();
-    //
-    // if(currentUser.isAuthenticated()){
-    // // TODO
-    // // return
-    // }
-
     String loginName = user.getLoginName();
     String password = user.getPassword();
+
+    ComUser comUser = comUserService.userLogin(loginName, password);
+
+    Date accessTime = DateTimeUtils.now();
 
     try {
       UsernamePasswordToken token = new UsernamePasswordToken(loginName, password);
@@ -63,6 +67,12 @@ public class UserAuthorityController {
       AuthUser authUser = new AuthUser();
       authUser.setLoginName(loginName);
       authUser.setPassword(password);
+      authUser.setUserId(comUser.getUserId());
+      authUser.setUserName(comUser.getUserName());
+      authUser.setDeptId(comUser.getDeptId());
+      authUser.setDeptName(null); //TODO
+      authUser.setRoleId(""+comUser.getRoleId()); //TODO
+      authUser.setAccessTime(accessTime);
       // authorityService.addUserToken(tokenString, authUser);
       authorityService.addUserToken(aaa, authUser);
 
