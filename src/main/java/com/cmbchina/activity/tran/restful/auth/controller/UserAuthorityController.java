@@ -70,8 +70,8 @@ public class UserAuthorityController {
       authUser.setUserId(comUser.getUserId());
       authUser.setUserName(comUser.getUserName());
       authUser.setDeptId(comUser.getDeptId());
-      authUser.setDeptName(null); //TODO
-      authUser.setRoleId(""+comUser.getRoleId()); //TODO
+      authUser.setDeptName(comUser.getDeptName());
+      authUser.setRoleId(""+comUser.getRoleId());//TODO
       authUser.setAccessTime(accessTime);
       // authorityService.addUserToken(tokenString, authUser);
       authorityService.addUserToken(aaa, authUser);

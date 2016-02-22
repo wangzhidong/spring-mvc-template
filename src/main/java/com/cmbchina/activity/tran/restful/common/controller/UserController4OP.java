@@ -2,6 +2,7 @@ package com.cmbchina.activity.tran.restful.common.controller;
 
 import com.cmbchina.activity.busi.common.service.ComUserService;
 import com.cmbchina.commons.bean.BusinessException;
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,8 @@ public class UserController4OP {
    */
   @RequestMapping(value = "listUsersByDept")
   public Object listUsersByDept(@PathVariable("role") String role, @RequestParam(value = "roleList[]") Byte[] roleList, String deptId, int page, int limit){
-    return null;
+    List roles = Lists.newArrayList(roleList);
+    return comUserService.listUserByDept(null,deptId,roles,page,limit);
   }
 
   /**
