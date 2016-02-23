@@ -12,6 +12,8 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.LockedAccountException;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,36 +36,44 @@ import java.util.Map;
 @RequestMapping(value = "common/auth")
 public class UserAuthorityController {
 
+  private static final Logger log = LoggerFactory.getLogger(UserAuthorityController.class);
+
   @Autowired
   private AuthorityService authorityService;
 
   @Autowired
   private ComUserService comUserService;
 
-  @RequestMapping(value = "{key}/login", method = RequestMethod.GET)
-  public ModelAndView userLogin(@PathVariable("key") String key, String userName, String password) {
-    ModelAndView mav = new ModelAndView();
-    return mav;
-  }
+  // @RequestMapping(value = "{key}/login", method = RequestMethod.GET)
+  // public ModelAndView userLogin(@PathVariable("key") String key, String userName, String
+  // password) {
+  // ModelAndView mav = new ModelAndView();
+  // return mav;
+  // }
 
 
   @RequestMapping(value = "{key}/login", method = RequestMethod.POST)
   @ResponseBody
-  public Map userLogin(UserAuthRequest user, HttpServletRequest request) throws BusinessException {
+  public Map userLogin(UserAuthRequest user, HttpServletRequest request) {
 
     String loginName = user.getLoginName();
     String password = user.getPassword();
+    String remoteHost = request.getRemoteHost();
 
-    ComUser comUser = comUserService.userLogin(loginName, password);
-
-    Date accessTime = DateTimeUtils.now();
 
     try {
+      ComUser comUser = comUserService.userLogin(loginName, password);
+      if (comUser == null) {
+
+      }
+
+      Date accessTime = DateTimeUtils.now();
+
       UsernamePasswordToken token = new UsernamePasswordToken(loginName, password);
-      // currentUser.login(token);
       String tokenString = JSONObject.toJSONString(token);
       String aaa =
-          String.format("%s-%s-%d", tokenString, request.getRemoteHost(), request.getRemotePort());
+          String.format("%s-%s-%d", tokenString, request.getRemoteHost(), request.getRemotePort()); // TODO
+
       AuthUser authUser = new AuthUser();
       authUser.setLoginName(loginName);
       authUser.setPassword(password);
@@ -71,28 +81,29 @@ public class UserAuthorityController {
       authUser.setUserName(comUser.getUserName());
       authUser.setDeptId(comUser.getDeptId());
       authUser.setDeptName(comUser.getDeptName());
-      authUser.setRoleId(""+comUser.getRoleId());//TODO
+      authUser.setRoleId("" + comUser.getRoleId());// TODO
       authUser.setAccessTime(accessTime);
-      // authorityService.addUserToken(tokenString, authUser);
+      authUser.setRemoteHost(remoteHost);
       authorityService.addUserToken(aaa, authUser);
 
       Map result = new HashMap<String, String>();
       result.put(tokenString, loginName + password);
       return result;
       // TODO
+    } catch (BusinessException e) {
+      log.error("error:{}", e);
     } catch (LockedAccountException e) {
+      log.error("error:{}", e);
       e.printStackTrace();
     } catch (UnknownAccountException e) {
-
-      e.printStackTrace();
+      log.error("error:{}", e);
     } catch (AuthenticationException e) {
+      log.error("error:{}", e);
 
-      e.printStackTrace();
     } catch (Exception e) {
-
-      e.printStackTrace();
+      log.error("error:{}", e);
     }
-    return new HashMap();
+    return null;
   }
 
   @RequestMapping(value = "{key}/userLogout", method = RequestMethod.GET)
@@ -102,9 +113,9 @@ public class UserAuthorityController {
     try {
       result = authorityService.removeUserToken(token);
     } catch (BusinessException e) {
-      e.printStackTrace();
+      log.error("error:{}", e);
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("error:{}", e);
     }
     return result > 0 ? "success" : "error";
   }
@@ -113,31 +124,50 @@ public class UserAuthorityController {
   @ResponseBody
   public String userLoginTest(String userName, String password, HttpServletRequest request) {
 
-    System.out.println("object========>>>>:\n\t" + (request));
+    log.info("object========>>>>:{}", request);
     String method = request.getMethod();
     String remoteHost = request.getRemoteHost();
     int remotePort = request.getRemotePort();
-    System.out.printf("request method:%s, remoteHost:%s, remotePort:%d\n", method, remoteHost,
-        remotePort);
+    log.info("request method:{}, remoteHost:{}, remotePort:{}", method, remoteHost, remotePort);
 
     Object object = RequestContextHolder.getRequestAttributes();
-    System.out.println("object========>>>>:\n\t" + (object));
+    log.info("object========>>>>:{}", object);
 
-    // HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder
-    // .getRequestAttributes()).getRequest();
-    //
-    // System.out.println("http_request========>>>>:\n\t"+JSONObject.toJSONString(request));
     UserAuthRequest user = new UserAuthRequest();
     user.setLoginName(userName);
     user.setPassword(password);
     String result = null;
-    try {
-      result = JSONObject.toJSONString(this.userLogin(user, request));
-    } catch (BusinessException e) {
-      e.printStackTrace();
-    } catch (Exception e) {
-      e.printStackTrace();
+    result = JSONObject.toJSONString(this.userLogin(user, request));
+    return result;
+  }
+
+
+  /**
+   * 用户登录验证，主要面向资格平台
+   * 
+   * @param token
+   * @return
+   * @throws BusinessException
+   */
+  @RequestMapping(value = "validUserToken", method = RequestMethod.POST)
+  @ResponseBody
+  public Map validUserToken(String token, HttpServletRequest request) throws BusinessException {
+
+    AuthUser user = authorityService.getUserByToken(token);
+
+    if (user == null) {
+      return null;
     }
+
+    Map<String, String> result = new HashMap<String, String>();
+    result.put("userId", user.getUserId());
+    result.put("userName", user.getUserName());
+    result.put("deptId", user.getDeptId());
+    result.put("deptName", user.getDeptName());
+    result.put("roleId", user.getRoleId());
+
+    log.info("validUserToken, token:{}, userId:{}", token, user.getUserId());
+
     return result;
   }
 }

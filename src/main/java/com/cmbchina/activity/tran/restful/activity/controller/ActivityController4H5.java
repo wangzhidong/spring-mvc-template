@@ -1,22 +1,18 @@
 package com.cmbchina.activity.tran.restful.activity.controller;
 
-import java.util.List;
-import java.util.Map;
-
-import com.cmbchina.activity.busi.act.dto.ActGroup;
+import com.cmbchina.activity.busi.act.dto.ActBusiContext;
+import com.cmbchina.activity.busi.act.service.ActivityService;
+import com.cmbchina.commons.bean.BusinessException;
+import com.cmbchina.commons.util.KeyGenerator;
 import net.spy.memcached.compat.log.Logger;
 import net.spy.memcached.compat.log.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.cmbchina.activity.busi.act.dto.ActBusiContext;
-import com.cmbchina.activity.busi.act.service.ActivityService;
-import com.cmbchina.commons.bean.BusinessException;
-import com.cmbchina.commons.util.KeyGenerator;
+import java.util.Map;
 
 /**
  * Created by wangtingbang on 16/1/26.

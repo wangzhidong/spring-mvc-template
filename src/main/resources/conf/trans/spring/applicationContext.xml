@@ -81,7 +81,4 @@
                      interface="com.cmbchina.activity.busi.external.service.ExternalProductService"/>
 
     <context:component-scan base-package="com.cmbchina.activity.tran.*"/>
-    <!--<bean class="com.cmbchina.activity.tran.restful.activity.controller.ActivityController4OP" init-method="start">-->
-        <!--<property name="authorityService" ref="authorityService" />-->
-    <!--</bean>-->
 </beans>

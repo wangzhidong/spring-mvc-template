@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by wangtingbang on 16-2-17.
@@ -24,10 +25,6 @@ public class QualificationController4External {
 
   @Autowired
   private ExternalQualificationService externalQualificationService;
-
-//  public void setExternalQualificationService(ExternalQualificationService externalQualificationService){
-//    this.externalQualificationService = externalQualificationService;
-//  }
 
   @RequestMapping(value = "listAvailableQualifications", method = RequestMethod.POST)
   @ResponseBody
@@ -47,6 +44,12 @@ public class QualificationController4External {
     List result = this.externalQualificationService.getSubQualifications(quaGroupId);
 
     return result;
+  }
+
+  @RequestMapping(value = "queryQualificationUsages", method = RequestMethod.POST)
+  @ResponseBody
+  public Map queryQualificationUsages(String quaGroupId, String quaId){
+    return null;
   }
 
 }
