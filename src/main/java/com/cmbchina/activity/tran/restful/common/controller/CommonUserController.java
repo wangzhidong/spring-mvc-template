@@ -81,16 +81,15 @@ public class CommonUserController {
 
   /**
    * 部门人员列表
-   * @param roleList
-   * @param roleList
    * @param deptId
    * @param page
    * @param limit
    * @return
    */
-  @RequestMapping(value = "listUsersByDept")
-  public Object listUsersByDept(@PathVariable("role") String role, @RequestParam(value = "roleList[]") Byte[] roleList, String deptId, int page, int limit){
-    List roles = Lists.newArrayList(roleList);
+  @RequestMapping(value = "listUsersByDept", method = RequestMethod.GET)
+  @ResponseBody
+  public Object listUsersByDept(String deptId, int page, int limit){
+    List roles = Lists.newArrayList(1,2,3);
     return comUserService.listUserByDept(null,deptId,roles,page,limit);
   }
 
@@ -121,15 +120,14 @@ public class CommonUserController {
 
   /**
    * 用户列表
-   * @param param
    * @return
    * @throws BusinessException
    */
-  @RequestMapping(value = "listUsers", method = RequestMethod.POST)
+  @RequestMapping(value = "listUsers", method = RequestMethod.GET) //TODO
   @ResponseBody
-  // TODO
-  public List listUsers( Object param) throws BusinessException{
-    return null;
+  public List listUsers( int page, int limit, HttpServletRequest request) throws BusinessException{
+    //TODO
+    return comUserService.listUsers(null, page, limit);
   }
 
   /**
@@ -138,16 +136,17 @@ public class CommonUserController {
    * @return
    * @throws BusinessException
    */
-  @RequestMapping(value = "getUserInfo", method = RequestMethod.POST)
+  @RequestMapping(value = "getUserInfo", method = RequestMethod.GET) //TODO
   @ResponseBody
-  public Object getUserInfo(String userId) throws BusinessException{
+  public Object getUserInfo(String userId, HttpServletRequest request) throws BusinessException{
+    return comUserService.getUserInfo(null, userId); //TODO
 
-    return null;
   }
 
-  @RequestMapping(value = "deleteUser", method = RequestMethod.POST)
+  @RequestMapping(value = "deleteUser", method = RequestMethod.GET) //TODO
   @ResponseBody
-  public int deleteUser(String userId) throws BusinessException{
-    return 0;
+  public int deleteUser(String userId, HttpServletRequest request) throws BusinessException{
+    log.info("deleteUser:{}, {}", userId, request); //TODO
+    return comUserService.deleteUser(null, userId);
   }
 }
