@@ -1,5 +1,6 @@
 package com.cmbchina.activity.tran.restful.qualification.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.cmbchina.activity.busi.external.service.ExternalQualificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,7 @@ public class QualificationController4OP {
     log.info("listAvailableQualifications req: areaCode={}, deptId={}, page={}, limit={}", areaCode, deptId, page, limit);
     List result = externalQualificationService.listAvailableQualifications(areaCode, deptId,page,limit);
     log.info("result:{}", result == null || result.size()==0?"0":result);
+    log.info("result:{}", JSONObject.toJSONString(result));
     return result;
   }
 }
