@@ -2,6 +2,7 @@ package com.cmbchina.activity.tran.restful.qualification.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.cmbchina.activity.busi.external.dto.QualificationReqParam;
+import com.cmbchina.activity.busi.external.service.ExternalQualificationService;
 import com.cmbchina.activity.busi.external.service.facade.CmbQualificationService;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
@@ -23,7 +24,7 @@ public class QualificationController4H5 {
   private static final Logger log = LoggerFactory.getLogger(QualificationController4H5.class);
 
   @Autowired
-  private CmbQualificationService cmbQualificationService; // TODO
+  private ExternalQualificationService externalQualificationService;
 
   @RequestMapping(value = "getQualificationByActIdAndUserId",
       method = {RequestMethod.POST, RequestMethod.GET})
@@ -59,6 +60,6 @@ public class QualificationController4H5 {
     param.setQuaId(QUA_ID);
     log.info("param:{}", param);
     log.info("param:{}", JSONObject.toJSONString(param));
-    return cmbQualificationService.getQualificationRules(param);
+    return externalQualificationService.getQualificationRules(param);
   }
 }
