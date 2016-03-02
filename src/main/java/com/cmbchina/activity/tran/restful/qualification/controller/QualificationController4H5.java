@@ -43,8 +43,8 @@ public class QualificationController4H5 {
     String QUA_GRP_ID = "1001"; //资格组ID  必输
     String QUA_ID = "100101"; //资格ID  QRY_TYP=Q时必输
 
-    List cardList = Lists.newArrayList(CRD_LST.split(","));
-    List cardTypeList = Lists.newArrayList(CRD_TYP_LST.split(","));
+    List cardList = Lists.newArrayList(CRD_LST);
+    List cardTypeList = Lists.newArrayList(CRD_TYP_LST);
 
     QualificationReqParam param = new QualificationReqParam();
     param.setCustomerId(CUST_ID);
