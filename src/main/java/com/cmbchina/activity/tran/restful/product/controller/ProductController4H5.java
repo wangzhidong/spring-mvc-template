@@ -67,7 +67,7 @@ public class ProductController4H5 {
 
     List products;
     try {
-      products = customerService.getUserProductList(customerId);
+      products = customerService.getCustomerProductList(customerId);
 
       if(products == null || products.size() == 0){
         log.info("no product for customer: {}", customerId);
