@@ -3,7 +3,6 @@ package com.cmbchina.activity.tran.restful.qualification.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.cmbchina.activity.busi.external.dto.QualificationReqParam;
 import com.cmbchina.activity.busi.external.service.ExternalQualificationService;
-import com.cmbchina.activity.busi.external.service.facade.CmbQualificationService;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -29,7 +29,7 @@ public class QualificationController4H5 {
   @RequestMapping(value = "getQualificationByActIdAndUserId",
       method = {RequestMethod.POST, RequestMethod.GET})
   @ResponseBody
-  public List queryQualification() {
+  public List queryQualification(String activityId, String customerId, String deviceId, HttpServletRequest request) {
 
     String CUST_ID = ""; //零售客户号/信用卡客户号
     String LOGIN_TYP = "D"; //手机银行登录类型 必输
@@ -43,14 +43,11 @@ public class QualificationController4H5 {
     String QUA_GRP_ID = "1001"; //资格组ID  必输
     String QUA_ID = "100101"; //资格ID  QRY_TYP=Q时必输
 
-    List cardList = Lists.newArrayList(CRD_LST);
-    List cardTypeList = Lists.newArrayList(CRD_TYP_LST);
-
     QualificationReqParam param = new QualificationReqParam();
     param.setCustomerId(CUST_ID);
     param.setLoginType(LOGIN_TYP);
-    param.setCardList(cardList);
-    param.setCardTypeList(cardTypeList);
+    param.setCardList(CRD_LST);
+    param.setCardTypeList(CRD_TYP_LST);
     param.setDeviceId(APP_ID);
     param.setIdentType(DOC_TYP_CD);
     param.setIdentNo(DOC_NBR);
