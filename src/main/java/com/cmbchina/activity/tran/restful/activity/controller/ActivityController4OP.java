@@ -121,6 +121,7 @@ public class ActivityController4OP {
    * @param approvalMessage
    * @return
    */
+  @RequestMapping(value = "approveActivity", method = RequestMethod.POST)
   public String approveActivity(String actGroupId, Byte approvalResult, String approvalMessage){
     return null;
   }
@@ -132,6 +133,7 @@ public class ActivityController4OP {
    * @param flag
    * @return
    */
+  @RequestMapping(value = "setActivityOnline", method = RequestMethod.POST)
   public String setActivityOnline(String actGroupId, Byte flag){
     return null;
   }
@@ -147,6 +149,7 @@ public class ActivityController4OP {
    * @param statusList
    * @return
    */
+  @RequestMapping(value = "monitorActivity", method = RequestMethod.POST)
   public String monitorActivity(String actGroupId, String commitUserName, Date startTime, Date endTime,
     List<String> areaCodeList, List<Byte> statusList ){
     return null;
@@ -160,6 +163,7 @@ public class ActivityController4OP {
    * @param status
    * @return
    */
+  @RequestMapping(value = "monitorActivityDetail", method = RequestMethod.POST)
   public String monitorActivityDetail( String actGroupId, Date time, Byte status ){
     return null;
   }
@@ -172,6 +176,7 @@ public class ActivityController4OP {
    * @param status
    * @return
    */
+  @RequestMapping(value = "monitorActivityByUser", method = RequestMethod.POST)
   public String monitorActivityByUser( String customerId, String actGroupId, Byte status){
     return null;
   }

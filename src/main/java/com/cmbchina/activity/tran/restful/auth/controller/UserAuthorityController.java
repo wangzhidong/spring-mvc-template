@@ -41,15 +41,7 @@ public class UserAuthorityController {
   @Autowired
   private ComUserService comUserService;
 
-  // @RequestMapping(value = "{key}/login", method = RequestMethod.GET)
-  // public ModelAndView userLogin(@PathVariable("key") String key, String userName, String
-  // password) {
-  // ModelAndView mav = new ModelAndView();
-  // return mav;
-  // }
-
-
-  @RequestMapping(value = "{key}/login", method = RequestMethod.POST)
+  @RequestMapping(value = "userLogin", method = RequestMethod.POST)
   @ResponseBody
   public String userLogin(UserAuthRequest user, HttpServletRequest request) {
 
@@ -69,11 +61,6 @@ public class UserAuthorityController {
 
       Date accessTime = DateTimeUtils.now();
 
-//      UsernamePasswordToken token = new UsernamePasswordToken(loginName, password);
-//      String tokenString = JSONObject.toJSONString(token);
-//      String aaa =
-//          String.format("%s-%s-%d", tokenString, request.getRemoteHost(), request.getRemotePort()); // TODO
-
       AuthUser authUser = new AuthUser();
       authUser.setLoginName(loginName);
       authUser.setPassword(password);
@@ -86,9 +73,6 @@ public class UserAuthorityController {
       authUser.setRemoteHost(remoteHost);
       authorityService.addUserToken(token, authUser);
 
-//      Map result = new HashMap<String, String>();
-//      result.put(token, loginName + password);
-//      return result;
       return token;
       // TODO
     } catch (BusinessException e) {
@@ -107,7 +91,7 @@ public class UserAuthorityController {
     return null;
   }
 
-  @RequestMapping(value = "{key}/userLogout", method = RequestMethod.GET)
+  @RequestMapping(value = "userLogout", method = RequestMethod.GET)
   @ResponseBody
   public String userLogout(String token) {
     int result = -1;
@@ -121,7 +105,7 @@ public class UserAuthorityController {
     return result > 0 ? "success" : "error";
   }
 
-  @RequestMapping(value = "{key}/userLoginTest", method = RequestMethod.GET)
+  @RequestMapping(value = "userLoginTest", method = RequestMethod.GET)
   @ResponseBody
   public String userLoginTest(String userName, String password, HttpServletRequest request) {
 
