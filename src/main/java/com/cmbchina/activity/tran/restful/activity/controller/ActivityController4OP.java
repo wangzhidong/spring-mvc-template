@@ -3,6 +3,8 @@ package com.cmbchina.activity.tran.restful.activity.controller;
 import java.util.Date;
 import java.util.List;
 
+import com.cmbchina.commons.bean.BusinessException;
+import com.google.common.collect.Lists;
 import net.spy.memcached.compat.log.Logger;
 import net.spy.memcached.compat.log.LoggerFactory;
 
@@ -18,6 +20,8 @@ import com.cmbchina.activity.busi.act.dto.ActivityRequest;
 import com.cmbchina.activity.busi.act.dto.ActivityResponse;
 import com.cmbchina.activity.busi.act.service.ActivityService;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * Created by wangtingbang on 16/1/13.
  */
@@ -32,8 +36,8 @@ public class ActivityController4OP {
   private ActivityService activityService;
 
   /**
-   * 活动列表
-   * URL: listActivities
+   * 活动列表 URL: listActivities
+   * 
    * @param userId
    * @param roleId
    * @param deptId
@@ -45,37 +49,44 @@ public class ActivityController4OP {
    * @param status
    * @return
    */
-  @RequestMapping(value = "listActivities", method = RequestMethod.GET) // TODO GET for Test
+  @RequestMapping(value = "listActivities", method = {RequestMethod.GET, RequestMethod.POST})
   @ResponseBody
-  public String listAcitivties(String userId, String roleId, String deptId,
-    Date startTime, Date endTime, Date commitTimeStart, Date commitTimeEnd,
-    String commitUserName, Byte status){
+  public List listAcitivties(String userId, String roleId, String deptId, Date startTime,
+      Date endTime, Date commitTimeStart, Date commitTimeEnd, String commitUserName, Byte status,
+      HttpServletRequest request) {
 
-    ActivityRequest request = new ActivityRequest();
-    request.setActivityId("111");
-    request.setActivityName("dubbox-->dubbox-demo-->com.alibaba.dubbo.demo.consumer.DemoActivityAction");
-
-    //TODO
-    ActivityResponse response = activityService.queryActivity(request);
-    String result = JSONObject.toJSONString(response);
-    return result;
+    String cookies = request.getCookies().toString();
+    String session = request.getSession().toString();
+    log.info("cookies:{}, session:{}", cookies, session);
+    try {
+      List result = activityService.listActivities(null, userId, roleId, deptId, startTime, endTime,
+          commitTimeStart, commitTimeEnd, commitUserName, Lists.newArrayList(status));
+      return result;
+    } catch (BusinessException e) {
+      log.error("error:{}", e);
+      return null;
+    } catch (Exception e) {
+      log.error("error:{}", e);
+      return null;
+    }
   }
 
   /**
-   * 活动查看
-   * URL: getActivityInfo
+   * 活动查看 URL: getActivityInfo
+   * 
    * @param actGroupId
    * @return
    */
   @RequestMapping(value = "getActivityInfo", method = RequestMethod.POST)
   @ResponseBody
-  public String findActivity(String actGroupId){
+  public String findActivity(String actGroupId) {
+
     return null;
   }
 
   /**
-   * 活动配置/新增
-   * URL: addActivity
+   * 活动配置/新增 URL: addActivity
+   * 
    * @param actGroup
    * @param activities
    * @param actExtends
@@ -83,13 +94,13 @@ public class ActivityController4OP {
    */
   @RequestMapping(value = "addActivity", method = RequestMethod.POST)
   @ResponseBody
-  public String addActivity(Object actGroup, List<ActActivity> activities, Object actExtends ){
+  public String addActivity(Object actGroup, List<ActActivity> activities, Object actExtends) {
     return null;
   }
 
   /**
-   * 活动修改
-   * URL: updateActivity
+   * 活动修改 URL: updateActivity
+   * 
    * @param actGroup
    * @param activities
    * @param actExtends
@@ -97,50 +108,50 @@ public class ActivityController4OP {
    */
   @RequestMapping(value = "updateActivity", method = RequestMethod.POST)
   @ResponseBody
-  public String updateActivity(Object actGroup, List<ActActivity> activities, Object actExtends ){
+  public String updateActivity(Object actGroup, List<ActActivity> activities, Object actExtends) {
     return null;
   }
 
   /**
-   * 活动提交
-   * commitActivity
+   * 活动提交 commitActivity
+   * 
    * @param actGroupId
    * @return
    */
   @RequestMapping(value = "commitActivity", method = RequestMethod.POST)
   @ResponseBody
-  public String commitActivity(String actGroupId){
+  public String commitActivity(String actGroupId) {
     return null;
   }
 
   /**
-   * 活动审批
-   * URL: approveActivity
+   * 活动审批 URL: approveActivity
+   * 
    * @param actGroupId
    * @param approvalResult
    * @param approvalMessage
    * @return
    */
   @RequestMapping(value = "approveActivity", method = RequestMethod.POST)
-  public String approveActivity(String actGroupId, Byte approvalResult, String approvalMessage){
+  public String approveActivity(String actGroupId, Byte approvalResult, String approvalMessage) {
     return null;
   }
 
   /**
-   * 活动上下线
-   * URL: setActivityOnline
+   * 活动上下线 URL: setActivityOnline
+   * 
    * @param actGroupId
    * @param flag
    * @return
    */
   @RequestMapping(value = "setActivityOnline", method = RequestMethod.POST)
-  public String setActivityOnline(String actGroupId, Byte flag){
+  public String setActivityOnline(String actGroupId, Byte flag) {
     return null;
   }
 
   /**
-   * 活动效果概览
-   * URL: monitorActivity
+   * 活动效果概览 URL: monitorActivity
+   * 
    * @param actGroupId
    * @param commitUserName
    * @param startTime
@@ -150,34 +161,34 @@ public class ActivityController4OP {
    * @return
    */
   @RequestMapping(value = "monitorActivity", method = RequestMethod.POST)
-  public String monitorActivity(String actGroupId, String commitUserName, Date startTime, Date endTime,
-    List<String> areaCodeList, List<Byte> statusList ){
+  public String monitorActivity(String actGroupId, String commitUserName, Date startTime,
+      Date endTime, List<String> areaCodeList, List<Byte> statusList) {
     return null;
   }
 
   /**
-   * 活动效果详情
-   * URL: monitorActivityDetail
+   * 活动效果详情 URL: monitorActivityDetail
+   * 
    * @param actGroupId
    * @param time
    * @param status
    * @return
    */
   @RequestMapping(value = "monitorActivityDetail", method = RequestMethod.POST)
-  public String monitorActivityDetail( String actGroupId, Date time, Byte status ){
+  public String monitorActivityDetail(String actGroupId, Date time, Byte status) {
     return null;
   }
 
   /**
-   * 活动参与详情
-   * URL: monitorActivityByUser
+   * 活动参与详情 URL: monitorActivityByUser
+   * 
    * @param customerId
    * @param actGroupId
    * @param status
    * @return
    */
   @RequestMapping(value = "monitorActivityByUser", method = RequestMethod.POST)
-  public String monitorActivityByUser( String customerId, String actGroupId, Byte status){
+  public String monitorActivityByUser(String customerId, String actGroupId, Byte status) {
     return null;
   }
 

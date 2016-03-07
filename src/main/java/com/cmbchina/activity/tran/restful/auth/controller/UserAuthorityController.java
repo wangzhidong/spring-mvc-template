@@ -5,7 +5,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
+import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.LockedAccountException;
 import org.apache.shiro.authc.UnknownAccountException;
@@ -13,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -41,16 +45,24 @@ public class UserAuthorityController {
   @Autowired
   private ComUserService comUserService;
 
-  @RequestMapping(value = "userLogin", method = RequestMethod.POST)
+  @RequestMapping(value = "userLogin", method = {RequestMethod.POST, RequestMethod.GET})
   @ResponseBody
-  public String userLogin(UserAuthRequest user, HttpServletRequest request) {
+  public Map userLogin(UserAuthRequest user, HttpServletRequest request) {
 
     String loginName = user.getLoginName();
     String password = user.getPassword();
     String remoteHost = request.getRemoteHost();
 
-
     try {
+      String existedToken = authorityService.getTokenByLoginName(loginName);
+      if(!StringUtils.isEmpty(existedToken)){
+        log.debug("existed token for logged in user:{}", loginName);
+        AuthUser existedUser = authorityService.getUserByToken(existedToken);
+        Map existed = new HashMap();
+        existed.put("token",existedToken);
+        existed.put("user", existedUser);
+        return existed;
+      }
       Map loginResult = comUserService.userLogin(loginName, password);
       if (loginResult == null) {
         log.error("无效用户:{}", loginName);
@@ -73,8 +85,14 @@ public class UserAuthorityController {
       authUser.setRemoteHost(remoteHost);
       authorityService.addUserToken(token, authUser);
 
-      return token;
-      // TODO
+      request.getSession().setAttribute("token", token);
+      Map<String, String> response = new HashMap<String, String>();
+
+      response.put("token",token);
+      response.put("roleId",""+authUser.getRoleId());
+      response.put("deptId",""+authUser.getDeptId());
+      response.put("deptName",""+authUser.getDeptName());
+      return response;
     } catch (BusinessException e) {
       log.error("error:{}", e);
     } catch (LockedAccountException e) {
@@ -84,7 +102,6 @@ public class UserAuthorityController {
       log.error("error:{}", e);
     } catch (AuthenticationException e) {
       log.error("error:{}", e);
-
     } catch (Exception e) {
       log.error("error:{}", e);
     }
@@ -107,23 +124,17 @@ public class UserAuthorityController {
 
   @RequestMapping(value = "userLoginTest", method = RequestMethod.GET)
   @ResponseBody
-  public String userLoginTest(String userName, String password, HttpServletRequest request) {
+  public String userLoginTest(String userName, String password, HttpServletRequest request, Model model, HttpSession session) {
 
-//    log.info("object========>>>>:{}", request);
-//    String method = request.getMethod();
-//    String remoteHost = request.getRemoteHost();
-//    int remotePort = request.getRemotePort();
-//    log.info("request method:{}, remoteHost:{}, remotePort:{}", method, remoteHost, remotePort);
-//
-//    Object object = RequestContextHolder.getRequestAttributes();
-//    log.info("object========>>>>:{}", object);
-
+    log.info("session:{}",session.getAttribute("token"));
     UserAuthRequest user = new UserAuthRequest();
     user.setLoginName(userName);
     user.setPassword(password);
-//    String result = JSONObject.toJSONString(this.userLogin(user, request));
-//    return result;
-    return this.userLogin(user, request);
+    Map result = this.userLogin(user, request);
+    String token = (String) result.get("token");
+    session.setAttribute("token",token);
+//    return token;
+    return JSONObject.toJSONString(result);
   }
 
 

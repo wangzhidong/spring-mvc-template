@@ -17,7 +17,7 @@ import java.util.List;
  */
 
 @Controller
-@RequestMapping(value="common/department")
+@RequestMapping(value = "common/department")
 public class CommonDepartmentController {
 
   private static final Logger log = LoggerFactory.getLogger(CommonDepartmentController.class);
@@ -25,11 +25,12 @@ public class CommonDepartmentController {
   @Autowired
   private ComDepartmentService comDepartmentService;
 
-  @RequestMapping(value="{role}/listDepartments", method = RequestMethod.POST)
+  @RequestMapping(value = "{role}/listDepartments",
+      method = {RequestMethod.POST, RequestMethod.GET})
   @ResponseBody
-  public List listDepartments(@PathVariable("role") String role, int page, int limit ){
+  public List listDepartments(@PathVariable("role") String role, int page, int limit) {
     log.info("CommonDepartmentController.listDepartments call:{},{},{}", role, page, limit);
-    List result = comDepartmentService.listDepartments(page,limit);
+    List result = comDepartmentService.listDepartments(page, limit);
     return result;
   }
 }

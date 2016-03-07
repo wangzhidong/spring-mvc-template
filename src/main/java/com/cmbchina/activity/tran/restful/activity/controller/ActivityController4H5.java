@@ -31,7 +31,7 @@ public class ActivityController4H5 {
    * @param channel
    * @return
    */
-  @RequestMapping(value = "listActivities4H5", method = RequestMethod.GET)//{RequestMethod.GET, RequestMethod.POST})
+  @RequestMapping(value = "listActivities4H5", method = {RequestMethod.GET, RequestMethod.POST})
   @ResponseBody
   public Object listActivities4H5(String areaCode, Byte channel) {
     ActBusiContext context = new ActBusiContext();
@@ -40,7 +40,6 @@ public class ActivityController4H5 {
 
     try {
       Map groups = activityService.listActivityGroups(context, areaCode, channel);
-//      return com.alibaba.fastjson.JSONObject.toJSONString(groups);
       return groups;
     } catch (BusinessException e) {
       log.error("error:", e);
