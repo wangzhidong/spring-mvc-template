@@ -55,11 +55,11 @@ public class UserAuthorityController {
 
     try {
       String existedToken = authorityService.getTokenByLoginName(loginName);
-      if(!StringUtils.isEmpty(existedToken)){
+      if (!StringUtils.isEmpty(existedToken)) {
         log.debug("existed token for logged in user:{}", loginName);
         AuthUser existedUser = authorityService.getUserByToken(existedToken);
         Map existed = new HashMap();
-        existed.put("token",existedToken);
+        existed.put("token", existedToken);
         existed.put("user", existedUser);
         return existed;
       }
@@ -68,8 +68,8 @@ public class UserAuthorityController {
         log.error("无效用户:{}", loginName);
         return null;
       }
-      ComUser comUser = (ComUser)(loginResult.get("user"));
-      String token = (String)(loginResult.get("token"));
+      ComUser comUser = (ComUser) (loginResult.get("user"));
+      String token = (String) (loginResult.get("token"));
 
       Date accessTime = DateTimeUtils.now();
 
@@ -88,10 +88,10 @@ public class UserAuthorityController {
       request.getSession().setAttribute("token", token);
       Map<String, String> response = new HashMap<String, String>();
 
-      response.put("token",token);
-      response.put("roleId",""+authUser.getRoleId());
-      response.put("deptId",""+authUser.getDeptId());
-      response.put("deptName",""+authUser.getDeptName());
+      response.put("token", token);
+      response.put("roleId", "" + authUser.getRoleId());
+      response.put("deptId", "" + authUser.getDeptId());
+      response.put("deptName", "" + authUser.getDeptName());
       return response;
     } catch (BusinessException e) {
       log.error("error:{}", e);
@@ -102,6 +102,9 @@ public class UserAuthorityController {
       log.error("error:{}", e);
     } catch (AuthenticationException e) {
       log.error("error:{}", e);
+    } catch (com.alibaba.dubbo.rpc.RpcException e) {
+      log.error("error:{}", e);
+      return null;
     } catch (Exception e) {
       log.error("error:{}", e);
     }
@@ -124,16 +127,20 @@ public class UserAuthorityController {
 
   @RequestMapping(value = "userLoginTest", method = RequestMethod.GET)
   @ResponseBody
-  public String userLoginTest(String userName, String password, HttpServletRequest request, Model model, HttpSession session) {
+  public String userLoginTest(String userName, String password, HttpServletRequest request,
+      Model model, HttpSession session) {
 
-    log.info("session:{}",session.getAttribute("token"));
+    log.info("session:{}", session.getAttribute("token"));
     UserAuthRequest user = new UserAuthRequest();
     user.setLoginName(userName);
     user.setPassword(password);
     Map result = this.userLogin(user, request);
+    if (result == null) {
+      return null;
+    }
     String token = (String) result.get("token");
-    session.setAttribute("token",token);
-//    return token;
+    session.setAttribute("token", token);
+    // return token;
     return JSONObject.toJSONString(result);
   }
 
@@ -166,7 +173,8 @@ public class UserAuthorityController {
 
     return result;
   }
-  //TODO for test
+
+  // TODO for test
   @RequestMapping(value = "validUserToken", method = RequestMethod.GET)
   @ResponseBody
   public Map validUserTokenGET(String token, HttpServletRequest request) throws BusinessException {

@@ -1,8 +1,8 @@
 package com.cmbchina.activity.tran.restful.activity.controller;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
+import com.cmbchina.activity.busi.act.dto.ActGroup;
 import com.cmbchina.commons.bean.BusinessException;
 import com.google.common.collect.Lists;
 import net.spy.memcached.compat.log.Logger;
@@ -10,9 +10,7 @@ import net.spy.memcached.compat.log.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import com.alibaba.fastjson.JSONObject;
 import com.cmbchina.activity.busi.act.dto.ActActivity;
@@ -77,10 +75,27 @@ public class ActivityController4OP {
    * @param actGroupId
    * @return
    */
-  @RequestMapping(value = "getActivityInfo", method = RequestMethod.POST)
+  @RequestMapping(value = "getActivityInfo", method = {RequestMethod.POST, RequestMethod.GET})
   @ResponseBody
-  public String findActivity(String actGroupId) {
+  public Map findActivity(String actGroupId) {
 
+    try {
+      ActGroup group = activityService.getActGroupById(null, actGroupId);
+
+      List<ActActivity> activities = activityService.listActByGroupId(null, actGroupId);
+
+      Map result = new HashMap();
+
+      result.put("group",group);
+      result.put("activities", activities);
+
+      log.info(JSONObject.toJSONString(result));
+      return result;
+    }catch (BusinessException e){
+      e.printStackTrace();
+    }catch (Exception e){
+      e.printStackTrace();
+    }
     return null;
   }
 
@@ -94,7 +109,9 @@ public class ActivityController4OP {
    */
   @RequestMapping(value = "addActivity", method = RequestMethod.POST)
   @ResponseBody
-  public String addActivity(Object actGroup, List<ActActivity> activities, Object actExtends) {
+  public String addActivity(Object actGroup,@RequestParam(value = "activities[]") List<ActActivity> activities, Object actExtends) {
+
+    log.info(JSONObject.toJSONString(actGroup));
     return null;
   }
 
@@ -192,4 +209,60 @@ public class ActivityController4OP {
     return null;
   }
 
+  @RequestMapping(value = "testPostMan", method = RequestMethod.POST)
+  @ResponseBody
+  public List<String> testPostMan(@RequestParam(value = "argvs")List<String> argv){
+    return argv;
+  }
+
+  @RequestMapping(value = "testPostManString", method = RequestMethod.POST)
+  @ResponseBody
+  public List<String> testPostMan(String argv){
+    return Lists.newArrayList(argv);
+  }
+
+  @RequestMapping(value = "testPostManArray", method = RequestMethod.POST)
+  @ResponseBody
+  public List<String> testPostMan(@RequestParam(value = "argv[]")String[] argv){
+    return Lists.newArrayList(argv);
+  }
+
+  @RequestMapping(value = "testPostManReturnArray", method = RequestMethod.POST)
+  @ResponseBody
+  public Object[] testPostManReturnArray(String argv){
+    return Lists.newArrayList(argv, argv+argv).toArray();
+  }
+
+  @RequestMapping(value = "testPostManGetList", method = RequestMethod.POST)
+  @ResponseBody
+  public Object[] testPostManGetList(@RequestParam(value = "argv[]")List<String> argv){
+    log.info(argv);
+    return argv.toArray();
+  }
+
+  @RequestMapping(value = "addActivityTestVo", method = RequestMethod.POST)
+  @ResponseBody
+  public String addActivityTest(@RequestBody @RequestParam(value = "group")ActGroup group, @RequestBody @RequestParam(value = "activities")ActActivity activities) {
+
+    log.info(JSONObject.toJSONString(group));
+    log.info(JSONObject.toJSONString(activities));
+    return (JSONObject.toJSONString(activities));
+  }
+  @RequestMapping(value = "addActivityTestMap", method = RequestMethod.POST)
+  @ResponseBody
+  public String addActivityTest(@RequestBody @RequestParam(value = "activites")HashMap activities, @RequestBody @RequestParam(value = "group") HashMap group) {
+
+    log.info(JSONObject.toJSONString(activities));
+//    return (JSONObject.toJSONString(activities)+"||"+JSONObject.toJSONString(group));
+    return (JSONObject.toJSONString(activities));
+  }
+
+  @RequestMapping(value = "addActivityTestSingleVo", method = RequestMethod.POST)
+  @ResponseBody
+  public String addActivityTest(@RequestBody @RequestParam(value = "activities")ActActivity activities) {
+//    public String addActivityTest(@RequestBody @RequestParam(value = "activities")ActActivity activities) {
+
+    log.info(JSONObject.toJSONString(activities));
+    return (JSONObject.toJSONString(activities));
+  }
 }

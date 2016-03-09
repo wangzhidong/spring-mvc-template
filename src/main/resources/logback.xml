@@ -26,6 +26,7 @@
 		</layout>
 	</appender>
 	<logger name="dao" level="INFO" />
+	<logger name="org.springframework" level="DEBUG" />
 	<logger name="com.cmbchina" level="INFO" />
 	<root level="INFO">
 		<appender-ref ref="console" />
