@@ -1,24 +1,25 @@
 package com.cmbchina.activity.tran.restful.activity.controller;
 
-import java.util.*;
-
+import com.alibaba.fastjson.JSONObject;
+import com.cmbchina.activity.busi.act.constant.ActivityConstants;
+import com.cmbchina.activity.busi.act.dto.ActActivity;
 import com.cmbchina.activity.busi.act.dto.ActGroup;
+import com.cmbchina.activity.busi.act.service.ActivityService;
 import com.cmbchina.commons.bean.BusinessException;
+import com.cmbchina.commons.util.DateTimeUtils;
 import com.google.common.collect.Lists;
 import net.spy.memcached.compat.log.Logger;
 import net.spy.memcached.compat.log.LoggerFactory;
-
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import com.alibaba.fastjson.JSONObject;
-import com.cmbchina.activity.busi.act.dto.ActActivity;
-import com.cmbchina.activity.busi.act.dto.ActivityRequest;
-import com.cmbchina.activity.busi.act.dto.ActivityResponse;
-import com.cmbchina.activity.busi.act.service.ActivityService;
-
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by wangtingbang on 16/1/13.
@@ -35,30 +36,120 @@ public class ActivityController4OP {
 
   /**
    * 活动列表 URL: listActivities
-   * 
-   * @param userId
-   * @param roleId
-   * @param deptId
-   * @param startTime
-   * @param endTime
-   * @param commitTimeStart
-   * @param commitTimeEnd
-   * @param commitUserName
-   * @param status
+   *
+   * @param req
    * @return
    */
   @RequestMapping(value = "listActivities", method = {RequestMethod.GET, RequestMethod.POST})
   @ResponseBody
-  public List listAcitivties(String userId, String roleId, String deptId, Date startTime,
-      Date endTime, Date commitTimeStart, Date commitTimeEnd, String commitUserName, Byte status,
-      HttpServletRequest request) {
+  public List listAcitivties(@RequestBody HashMap req, HttpServletRequest request) {
+    if (req == null) {
+      return null;
+    }
+    Map param = (Map) req.get("param");
 
-    String cookies = request.getCookies().toString();
-    String session = request.getSession().toString();
-    log.info("cookies:{}, session:{}", cookies, session);
+    String userId = (String) param.get("userId");
+    String roleId = (String) param.get("roleId");
+    String deptId = (String) param.get("deptId");
+    Date startTime =
+        param.get("startTime") == null ? null : DateTimeUtils.toDateTime((String) param
+            .get("startTime"));
+    Date endTime =
+        param.get("endTime") == null ? null : DateTimeUtils.toDateTime((String) param
+            .get("endTime"));
+    Date commitTimeStart =
+        param.get("commitTimeStart") == null ? null : DateTimeUtils.toDateTime((String) param
+            .get("commitTimeStart"));
+    Date commitTimeEnd =
+        param.get("commitTimeStart") == null ? null : DateTimeUtils.toDateTime((String) param
+            .get("commitTimeEnd"));
+    String commitUserName = (String) param.get("commitUserName");
+    String status = (String) param.get("status");
+    // String cookies = request.getCookies().toString();
+    // String session = request.getSession().toString();
+    // log.info("cookies:{}, session:{}", cookies, session);
+    log.info(String
+        .format(
+            "userId:%s, roleId:%s, deptId:%s, startTime:%s,endTime:%s, commitTimeStart:%s, commitTimeEnd:%s, commitUserName:%s, status:%s\n",
+            userId, roleId, deptId, startTime, endTime, commitTimeStart, commitTimeEnd,
+            commitUserName, status));
+
     try {
-      List result = activityService.listActivities(null, userId, roleId, deptId, startTime, endTime,
-          commitTimeStart, commitTimeEnd, commitUserName, Lists.newArrayList(status));
+      List<Byte> statusList;
+      if (StringUtils.isEmpty(status)) {
+        statusList = Lists.newArrayList(ActivityConstants.ACTIVITY_STATUS.INIT.getValue(), //
+            ActivityConstants.ACTIVITY_STATUS.TO_BE_APPROVE.getValue(), //
+            ActivityConstants.ACTIVITY_STATUS.APPROVE_REJECTED.getValue(),//
+            ActivityConstants.ACTIVITY_STATUS.APPROVED.getValue(),//
+            ActivityConstants.ACTIVITY_STATUS.ONLINE.getValue(), //
+            ActivityConstants.ACTIVITY_STATUS.MANUALLY_OFFLINE.getValue());
+      } else {
+        statusList = Lists.newArrayList(Byte.parseByte(status));
+      }
+      List result =
+          activityService.listActivities(null, userId, roleId, deptId, startTime, endTime,
+              commitTimeStart, commitTimeEnd, commitUserName, statusList);
+      return result;
+    } catch (BusinessException e) {
+      log.error("error:{}", e);
+      return null;
+    } catch (Exception e) {
+      log.error("error:{}", e);
+      return null;
+    }
+  }
+
+
+  /**
+   * 活动列表 URL: listActivities
+   *
+   * @param req
+   * @param request
+   * @return
+   */
+  @RequestMapping(value = "listActivities4Approval", method = {RequestMethod.GET,
+      RequestMethod.POST})
+  @ResponseBody
+  public List listActivities4Approval(@RequestBody HashMap req, HttpServletRequest request) {
+    if (req == null) {
+      return null;
+    }
+    Map param = (Map) req.get("param");
+
+    String userId = (String) param.get("userId");
+    String roleId = (String) param.get("roleId");
+    String deptId = (String) param.get("deptId");
+    Date startTime =
+        param.get("startTime") == null ? null : DateTimeUtils.toDateTime((String) param
+            .get("startTime"));
+    Date endTime =
+        param.get("endTime") == null ? null : DateTimeUtils.toDateTime((String) param
+            .get("endTime"));
+    Date commitTimeStart =
+        param.get("commitTimeStart") == null ? null : DateTimeUtils.toDateTime((String) param
+            .get("commitTimeStart"));
+    Date commitTimeEnd =
+        param.get("commitTimeStart") == null ? null : DateTimeUtils.toDateTime((String) param
+            .get("commitTimeEnd"));
+    String commitUserName = (String) param.get("commitUserName");
+    String status = (String) param.get("status");
+    // String cookies = request.getCookies().toString();
+    // String session = request.getSession().toString();
+    // log.info("cookies:{}, session:{}", cookies, session);
+    log.info(String
+        .format(
+            "userId:%s, roleId:%s, deptId:%s, startTime:%s,endTime:%s, commitTimeStart:%s, commitTimeEnd:%s, commitUserName:%s, status:%s\n",
+            userId, roleId, deptId, startTime, endTime, commitTimeStart, commitTimeEnd,
+            commitUserName, status));
+    try {
+      List<Byte> statusList = null;
+      statusList = Lists.newArrayList(ActivityConstants.ACTIVITY_STATUS.TO_BE_APPROVE.getValue(), //
+          ActivityConstants.ACTIVITY_STATUS.APPROVED.getValue(),//
+          ActivityConstants.ACTIVITY_STATUS.ONLINE.getValue()//
+          );
+      List result =
+          activityService.listActivities(null, userId, roleId, deptId, startTime, endTime,
+              commitTimeStart, commitTimeEnd, commitUserName, statusList);
       return result;
     } catch (BusinessException e) {
       log.error("error:{}", e);
@@ -71,7 +162,7 @@ public class ActivityController4OP {
 
   /**
    * 活动查看 URL: getActivityInfo
-   * 
+   *
    * @param actGroupId
    * @return
    */
@@ -86,14 +177,14 @@ public class ActivityController4OP {
 
       Map result = new HashMap();
 
-      result.put("group",group);
+      result.put("group", group);
       result.put("activities", activities);
 
       log.info(JSONObject.toJSONString(result));
       return result;
-    }catch (BusinessException e){
+    } catch (BusinessException e) {
       e.printStackTrace();
-    }catch (Exception e){
+    } catch (Exception e) {
       e.printStackTrace();
     }
     return null;
@@ -101,7 +192,7 @@ public class ActivityController4OP {
 
   /**
    * 活动配置/新增 URL: addActivity
-   * 
+   *
    * @param actGroup
    * @param activities
    * @param actExtends
@@ -109,7 +200,8 @@ public class ActivityController4OP {
    */
   @RequestMapping(value = "addActivity", method = RequestMethod.POST)
   @ResponseBody
-  public String addActivity(Object actGroup,@RequestParam(value = "activities[]") List<ActActivity> activities, Object actExtends) {
+  public String addActivity(Object actGroup,
+      @RequestParam(value = "activities[]") List<ActActivity> activities, Object actExtends) {
 
     log.info(JSONObject.toJSONString(actGroup));
     return null;
@@ -117,7 +209,7 @@ public class ActivityController4OP {
 
   /**
    * 活动修改 URL: updateActivity
-   * 
+   *
    * @param actGroup
    * @param activities
    * @param actExtends
@@ -131,32 +223,50 @@ public class ActivityController4OP {
 
   /**
    * 活动提交 commitActivity
-   * 
+   *
    * @param actGroupId
    * @return
    */
   @RequestMapping(value = "commitActivity", method = RequestMethod.POST)
   @ResponseBody
   public String commitActivity(String actGroupId) {
+
+    try {
+      int result = activityService.commitActivity(null, actGroupId);
+      return result == 1 ? "success":"error";
+    }catch (BusinessException e){
+      log.error(String.format("error:%s", e.getLocalizedMessage()));
+    }
     return null;
   }
 
   /**
    * 活动审批 URL: approveActivity
-   * 
-   * @param actGroupId
-   * @param approvalResult
-   * @param approvalMessage
+   *
+   * @param req
    * @return
    */
   @RequestMapping(value = "approveActivity", method = RequestMethod.POST)
-  public String approveActivity(String actGroupId, Byte approvalResult, String approvalMessage) {
+  @ResponseBody
+  public String approveActivity(@RequestBody HashMap req, HttpServletRequest request){ //String actGroupId, Byte approvalResult, String approvalMessage) {
+
+
+    Map param = (Map)req.get("param");
+    try {
+      String actGroupId = (String) param.get("actGroupId");
+      int approvalResult = (int) param.get("approvalResult");
+      String approvalMessage = (String) param.get("approvalMessage");
+      int result = activityService.approveActivity(null, actGroupId, (byte)approvalResult, approvalMessage);
+      return result == 1 ? "success":"error";
+    }catch (BusinessException e){
+      log.error(String.format("error:%s", e.getLocalizedMessage()));
+    }
     return null;
   }
 
   /**
    * 活动上下线 URL: setActivityOnline
-   * 
+   *
    * @param actGroupId
    * @param flag
    * @return
@@ -168,7 +278,7 @@ public class ActivityController4OP {
 
   /**
    * 活动效果概览 URL: monitorActivity
-   * 
+   *
    * @param actGroupId
    * @param commitUserName
    * @param startTime
@@ -185,7 +295,7 @@ public class ActivityController4OP {
 
   /**
    * 活动效果详情 URL: monitorActivityDetail
-   * 
+   *
    * @param actGroupId
    * @param time
    * @param status
@@ -198,7 +308,7 @@ public class ActivityController4OP {
 
   /**
    * 活动参与详情 URL: monitorActivityByUser
-   * 
+   *
    * @param customerId
    * @param actGroupId
    * @param status
@@ -211,57 +321,66 @@ public class ActivityController4OP {
 
   @RequestMapping(value = "testPostMan", method = RequestMethod.POST)
   @ResponseBody
-  public List<String> testPostMan(@RequestParam(value = "argvs")List<String> argv){
+  public List<String> testPostMan(@RequestParam(value = "argvs") List<String> argv) {
     return argv;
   }
 
   @RequestMapping(value = "testPostManString", method = RequestMethod.POST)
   @ResponseBody
-  public List<String> testPostMan(String argv){
+  public List<String> testPostMan(String argv) {
     return Lists.newArrayList(argv);
   }
 
   @RequestMapping(value = "testPostManArray", method = RequestMethod.POST)
   @ResponseBody
-  public List<String> testPostMan(@RequestParam(value = "argv[]")String[] argv){
+  public List<String> testPostMan(@RequestParam(value = "argv[]") String[] argv) {
     return Lists.newArrayList(argv);
   }
 
   @RequestMapping(value = "testPostManReturnArray", method = RequestMethod.POST)
   @ResponseBody
-  public Object[] testPostManReturnArray(String argv){
-    return Lists.newArrayList(argv, argv+argv).toArray();
+  public Object[] testPostManReturnArray(String argv) {
+    return Lists.newArrayList(argv, argv + argv).toArray();
   }
 
   @RequestMapping(value = "testPostManGetList", method = RequestMethod.POST)
   @ResponseBody
-  public Object[] testPostManGetList(@RequestParam(value = "argv[]")List<String> argv){
+  public Object[] testPostManGetList(@RequestParam(value = "argv[]") List<String> argv) {
     log.info(argv);
     return argv.toArray();
   }
 
   @RequestMapping(value = "addActivityTestVo", method = RequestMethod.POST)
   @ResponseBody
-  public String addActivityTest(@RequestBody @RequestParam(value = "group")ActGroup group, @RequestBody @RequestParam(value = "activities")ActActivity activities) {
+  public String addActivityTest(@RequestBody @RequestParam(value = "group") ActGroup group,
+      @RequestBody @RequestParam(value = "activities") ActActivity activities) {
 
     log.info(JSONObject.toJSONString(group));
     log.info(JSONObject.toJSONString(activities));
     return (JSONObject.toJSONString(activities));
   }
+
   @RequestMapping(value = "addActivityTestMap", method = RequestMethod.POST)
   @ResponseBody
-  public String addActivityTest(@RequestBody @RequestParam(value = "activites")HashMap activities, @RequestBody @RequestParam(value = "group") HashMap group) {
+  public String addActivityTest(@RequestBody HashMap activities) {
 
-    log.info(JSONObject.toJSONString(activities));
-//    return (JSONObject.toJSONString(activities)+"||"+JSONObject.toJSONString(group));
+    log.info("param:----->>>", JSONObject.toJSONString(activities));
+    Object param = activities.get("param");
+    log.info(param);
+    System.out.println(param);
+    // return (JSONObject.toJSONString(activities)+"||"+JSONObject.toJSONString(group));
     return (JSONObject.toJSONString(activities));
   }
 
   @RequestMapping(value = "addActivityTestSingleVo", method = RequestMethod.POST)
   @ResponseBody
-  public String addActivityTest(@RequestBody @RequestParam(value = "activities")ActActivity activities) {
-//    public String addActivityTest(@RequestBody @RequestParam(value = "activities")ActActivity activities) {
+  public String addActivityTest(@RequestBody ActActivity activities) {
+    // public String addActivityTest(@RequestBody @RequestParam(value = "activities")ActActivity
+    // activities) {
 
+    Object param = activities.getActivityId();
+    log.info(param);
+    System.out.println(param);
     log.info(JSONObject.toJSONString(activities));
     return (JSONObject.toJSONString(activities));
   }

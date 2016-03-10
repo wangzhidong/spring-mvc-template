@@ -21,7 +21,7 @@ public class TranFastJsonHttpMessageConverter extends FastJsonHttpMessageConvert
     HttpMessageNotWritableException {
     OutputStream out = outputMessage.getBody();
     SerializeConfig sc = new SerializeConfig();
-    sc.put(Date.class, new SimpleDateFormatSerializer("yyyy/MM/dd HH:mm:ss:SSS"));
+    sc.put(Date.class, new SimpleDateFormatSerializer("yyyy/MM/dd HH:mm:ss"));
 //    String text = JSON.toJSONString(obj, super.getFeatures());
     String text = JSON.toJSONString(obj, sc, super.getFeatures());
     byte[] bytes = text.getBytes(super.getCharset());

@@ -1,7 +1,9 @@
 package com.cmbchina.activity.tran.restful.message.controller;
 
+import com.cmbchina.activity.busi.common.dto.AuthUser;
 import com.cmbchina.activity.busi.common.dto.ComBusiContext;
 import com.cmbchina.activity.busi.common.dto.ComMessage;
+import com.cmbchina.activity.busi.common.service.AuthorityService;
 import com.cmbchina.activity.busi.common.service.ComMessageService;
 import com.cmbchina.commons.bean.BusinessException;
 import com.cmbchina.commons.util.DateTimeUtils;
@@ -29,13 +31,23 @@ public class MessageController {
   @Autowired
   private ComMessageService comMessageService;
 
+  @Autowired
+  private AuthorityService authorityService;
+
 //  @RequestMapping(value = "getUserNotice", method = RequestMethod.POST)
   @RequestMapping(value = "getUserNotice", method = RequestMethod.GET)
   @ResponseBody
-  public List<Object> getUserNotice(String userId, HttpServletRequest request)throws BusinessException{
+  public List<Object> getUserNotice(String token, HttpServletRequest request)throws BusinessException{
     ComBusiContext context = new ComBusiContext();
     context.setOperatorUserId(request.getRemoteUser()); //TODO
     context.setRequestSeqNo("MSG"+ DateTimeUtils.now());
+
+    AuthUser user = authorityService.getUserByToken(token);
+    if(user==null){
+      throw new BusinessException("","用户未登录");
+    }
+
+    String userId = user.getUserId();
     List result = comMessageService.getUserNotice(context, userId);
     return result;
   }

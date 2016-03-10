@@ -1,7 +1,9 @@
 package com.cmbchina.activity.tran.restful.common.controller;
 
+import com.cmbchina.activity.busi.common.dto.AuthUser;
 import com.cmbchina.activity.busi.common.dto.ComBusiContext;
 import com.cmbchina.activity.busi.common.dto.ComUser;
+import com.cmbchina.activity.busi.common.service.AuthorityService;
 import com.cmbchina.activity.busi.common.service.ComUserService;
 import com.cmbchina.commons.bean.BusinessException;
 import com.cmbchina.commons.util.DateTimeUtils;
@@ -30,6 +32,9 @@ public class CommonUserController {
 
   @Autowired
   private ComUserService comUserService;
+
+  @Autowired
+  private AuthorityService authorityService;
 
   /**
    * 部门人员列表，主要面向资格平台
@@ -132,15 +137,28 @@ public class CommonUserController {
 
   /**
    * 用户详情
-   * @param userId
+   * @param token
    * @return
    * @throws BusinessException
    */
   @RequestMapping(value = "getUserInfo", method = RequestMethod.GET) //TODO
   @ResponseBody
-  public Object getUserInfo(String userId, HttpServletRequest request) throws BusinessException{
-    return comUserService.getUserInfo(null, userId); //TODO
+  public Object getUserInfo(String token, HttpServletRequest request) throws BusinessException{
 
+    if(token == null){
+      return null;
+    }
+    AuthUser user = authorityService.getUserByToken(token);
+    if(user == null){
+      return null;// TODO
+    }
+    String userId = user.getUserId();
+    ComUser result = comUserService.getUserInfo(null, userId); //TODO
+    if(result == null){
+      log.error("user is null for userId:", userId);
+      return result;
+    }
+    return result;
   }
 
   @RequestMapping(value = "deleteUser", method = RequestMethod.GET) //TODO

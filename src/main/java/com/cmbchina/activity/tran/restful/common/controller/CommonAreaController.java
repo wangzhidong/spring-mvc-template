@@ -26,10 +26,10 @@ public class CommonAreaController {
 
   @RequestMapping(value = "listAreas", method = {RequestMethod.POST,RequestMethod.GET})
   @ResponseBody
-  public List listAreas(String role, int page, int limit, HttpSession session){
+  public List listAreas(String role, HttpSession session){
 
-    log.info("listAreas call:{}, {}, {}", role, page, limit);
-    List result = comAreaService.listAreas(page, limit);
+    log.info("listAreas call:{}", role );
+    List result = comAreaService.listAreas(1, 65535);
     return result;
   }
 }

@@ -31,7 +31,7 @@ public class DateTimeFormatAnnotationFormatterFactory
 
         @Override
         public String pattern() {
-          return DateTimeUtils.Pattern.DEFAULT_FORMATE_TIME;
+          return "yyyy/MM/dd HH:mm:ss";//DateTimeUtils.Pattern.DEFAULT_FORMATE_TIME;
         }
 
         @Override

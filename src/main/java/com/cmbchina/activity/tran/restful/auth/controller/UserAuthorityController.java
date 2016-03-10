@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import com.alibaba.fastjson.JSONObject;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.LockedAccountException;
@@ -17,8 +18,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.cmbchina.activity.busi.common.dto.AuthUser;
@@ -45,28 +48,36 @@ public class UserAuthorityController {
   @Autowired
   private ComUserService comUserService;
 
-  @RequestMapping(value = "userLogin", method = {RequestMethod.POST, RequestMethod.GET})
+  @RequestMapping(value = "userLogin", method = RequestMethod.POST)
   @ResponseBody
-  public Map userLogin(UserAuthRequest user, HttpServletRequest request) {
+  public Map userLogin(@RequestBody HashMap user, HttpServletRequest request) {
 
-    String loginName = user.getLoginName();
-    String password = user.getPassword();
+    log.info("user:", JSONObject.toJSONString(user));
+//    String loginName = user.getLoginName();
+//    String password = user.getPassword();
+    
+    String loginName = (String)((Map)user.get("param")).get("loginName");
+    String password = (String)((Map)user.get("param")).get("password");
+    log.info("user login:", loginName);
     String remoteHost = request.getRemoteHost();
 
     try {
-      String existedToken = authorityService.getTokenByLoginName(loginName);
-      if (!StringUtils.isEmpty(existedToken)) {
-        log.debug("existed token for logged in user:{}", loginName);
-        AuthUser existedUser = authorityService.getUserByToken(existedToken);
-        Map existed = new HashMap();
-        existed.put("token", existedToken);
-        existed.put("user", existedUser);
-        return existed;
-      }
       Map loginResult = comUserService.userLogin(loginName, password);
       if (loginResult == null) {
         log.error("无效用户:{}", loginName);
         return null;
+      }
+      String existedToken = authorityService.getTokenByLoginName(loginName);
+      if (!StringUtils.isEmpty(existedToken)) {
+        log.debug("existed token for logged in user:{}", loginName);
+        AuthUser existedUser = authorityService.getUserByToken(existedToken);
+        Map response = new HashMap();
+        response.put("token", existedToken);
+        response.put("roleId", "" + existedUser.getRoleId());
+        response.put("deptId", "" + existedUser.getDeptId());
+        response.put("deptName", "" + existedUser.getDeptName());
+        response.put("userId", existedUser.getUserId());
+        return response;
       }
       ComUser comUser = (ComUser) (loginResult.get("user"));
       String token = (String) (loginResult.get("token"));
@@ -92,6 +103,7 @@ public class UserAuthorityController {
       response.put("roleId", "" + authUser.getRoleId());
       response.put("deptId", "" + authUser.getDeptId());
       response.put("deptName", "" + authUser.getDeptName());
+      response.put("userName", authUser.getUserName());
       return response;
     } catch (BusinessException e) {
       log.error("error:{}", e);
@@ -131,10 +143,14 @@ public class UserAuthorityController {
       Model model, HttpSession session) {
 
     log.info("session:{}", session.getAttribute("token"));
-    UserAuthRequest user = new UserAuthRequest();
-    user.setLoginName(userName);
-    user.setPassword(password);
-    Map result = this.userLogin(user, request);
+//    UserAuthRequest user = new UserAuthRequest();
+//    user.setLoginName(userName);
+//    user.setPassword(password);
+    HashMap req = new HashMap();
+    req.put("loginName", userName);
+    req.put("password", password);
+    Map result = this.userLogin(req, request);
+//    Map result = this.userLogin(req);
     if (result == null) {
       return null;
     }
