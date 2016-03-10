@@ -13,11 +13,11 @@
 		http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
 
 
+    <context:component-scan base-package="com.cmbchina"/>
     <aop:aspectj-autoproxy proxy-target-class="true"/>
     <mvc:default-servlet-handler/>
-    <mvc:annotation-driven />
     <mvc:annotation-driven content-negotiation-manager="contentNegotiationManager">
-        <mvc:message-converters>
+        <mvc:message-converters register-defaults="true">
             <bean class="org.springframework.http.converter.StringHttpMessageConverter">
                 <constructor-arg value="UTF-8"></constructor-arg>
             </bean>
@@ -27,6 +27,15 @@
     <mvc:view-controller path="/" view-name="common/index"/>
 
     <!--<bean id="exceptionHandler" class="com.cmbchina.activity.tran.support.mvc.CommonExceptionHandler"/>-->
+
+    <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+        <property name="formatters">
+            <set>
+                <bean class="com.cmbchina.activity.tran.support.mvc.DateFormatter"></bean>
+                <bean class="com.cmbchina.activity.tran.support.mvc.DateTimeFormatAnnotationFormatterFactory"></bean>
+            </set>
+        </property>
+    </bean>
 
     <bean id="contentNegotiationManager"
           class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
@@ -39,6 +48,7 @@
             </value>
         </property>
     </bean>
+
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
         <property name="prefix" value="/WEB-INF/page/"/>
@@ -50,7 +60,7 @@
                        organization="cmbchina"/>
 
     <dubbo:registry address="zookeeper://127.0.0.1:2181"/>
-    <!--<dubbo:registry address="zookeeper://192.168.20.159:2181"/>-->
+    <!--<dubbo:registry address="zookeeper://192.168.20.3:2181"/>-->
     <dubbo:protocol name="dubbo" serialization="kryo"/>
 
     <dubbo:annotation package="com.cmbchina.activity.tran.restful.*"/>
