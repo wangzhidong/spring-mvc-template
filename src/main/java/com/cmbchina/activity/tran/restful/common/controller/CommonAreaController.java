@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by wangtingbang on 16/1/11.
@@ -26,10 +27,17 @@ public class CommonAreaController {
 
   @RequestMapping(value = "listAreas", method = {RequestMethod.POST,RequestMethod.GET})
   @ResponseBody
-  public List listAreas(String role, HttpSession session){
+  public List listAreas(String role, HttpSession session) {
 
-    log.info("listAreas call:{}", role );
+    log.info("listAreas call:{}", role);
     List result = comAreaService.listAreas(1, 65535);
+    return result;
+  }
+  @RequestMapping(value = "listAreasByGroup", method = {RequestMethod.POST,RequestMethod.GET})
+  @ResponseBody
+  public Map listAreasByGroup(HttpSession session){
+    log.info("listAreasByGroup call");
+    Map result = comAreaService.listAreasByGroup();
     return result;
   }
 }
