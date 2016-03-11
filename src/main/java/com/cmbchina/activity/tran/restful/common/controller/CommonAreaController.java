@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +39,32 @@ public class CommonAreaController {
   @ResponseBody
   public Map listAreasByGroup(HttpSession session){
     log.info("listAreasByGroup call");
-    Map result = comAreaService.listAreasByGroup();
+//    Map result = comAreaService.listAreasByGroup();
+    Map result = this.fakeArea(5,3);
+    return result;
+  }
+  private Map fakeArea(int limit, int subLimit){
+    Map result = new HashMap(limit);
+    for(int i=1;i<limit;i++){
+      Map group = new HashMap();
+//      List cityList = new ArrayList();
+      Map city = new HashMap();
+      for(int j=1;j<subLimit;j++){
+        Map sub = new HashMap();
+        sub.put("provinceId", "provinceId"+i);
+        sub.put("provinceName", "provinceName"+i);
+        sub.put("cityId",String.format("cityId%d%d", i, j));
+        sub.put("cityName",String.format("cityName%d%d", i, j));
+        city.put(sub.get("cityId"), sub);
+      }
+
+//      cityList.add(city);
+      group.put("provinceId", "provinceId"+i);
+      group.put("provinceName", "provinceName"+i);
+      group.put("cityList",city);
+
+      result.put("provinceId"+i, group);
+    }
     return result;
   }
 }

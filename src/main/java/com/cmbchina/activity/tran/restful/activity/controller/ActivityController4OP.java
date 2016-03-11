@@ -5,6 +5,7 @@ import com.cmbchina.activity.busi.act.constant.ActivityConstants;
 import com.cmbchina.activity.busi.act.dto.ActActivity;
 import com.cmbchina.activity.busi.act.dto.ActGroup;
 import com.cmbchina.activity.busi.act.service.ActivityService;
+import com.cmbchina.activity.busi.common.service.AuthorityService;
 import com.cmbchina.commons.bean.BusinessException;
 import com.cmbchina.commons.util.DateTimeUtils;
 import com.google.common.collect.Lists;
@@ -34,6 +35,9 @@ public class ActivityController4OP {
   @Autowired
   private ActivityService activityService;
 
+  @Autowired
+  private AuthorityService authorityService;
+
   /**
    * 活动列表 URL: listActivities
    *
@@ -42,6 +46,7 @@ public class ActivityController4OP {
    */
   @RequestMapping(value = "listActivities", method = {RequestMethod.GET, RequestMethod.POST})
   @ResponseBody
+  //TODO user role, auth, filter
   public List listAcitivties(@RequestBody HashMap req, HttpServletRequest request) {
     if (req == null) {
       return null;
@@ -99,6 +104,38 @@ public class ActivityController4OP {
     }
   }
 
+  /**
+   * 活动列表 URL: listActivities
+   *
+   * @param req
+   * @param request
+   * @return
+   */
+  @RequestMapping(value = "listActivities4Recommend", method = {RequestMethod.GET,
+          RequestMethod.POST})
+  @ResponseBody
+  public List listActivities4Recommend(@RequestBody HashMap req, HttpServletRequest request) {
+
+    if (req == null) {
+      return null;
+    }
+
+//    Map param = (Map) req.get("param");
+    try {
+      List<Byte> statusList = Lists.newArrayList(ActivityConstants.ACTIVITY_STATUS.ONLINE.getValue());
+      List result =
+        activityService.listActivities(null, null, null, null, null, null,
+          null, null, null, statusList);
+
+      return result;
+    } catch (BusinessException e) {
+      log.error("error:{}", e);
+      return null;
+    } catch (Exception e) {
+      log.error("error:{}", e);
+      return null;
+    }
+  }
 
   /**
    * 活动列表 URL: listActivities
@@ -114,8 +151,8 @@ public class ActivityController4OP {
     if (req == null) {
       return null;
     }
-    Map param = (Map) req.get("param");
 
+    Map param = (Map) req.get("param");
     String userId = (String) param.get("userId");
     String roleId = (String) param.get("roleId");
     String deptId = (String) param.get("deptId");
@@ -141,6 +178,8 @@ public class ActivityController4OP {
             "userId:%s, roleId:%s, deptId:%s, startTime:%s,endTime:%s, commitTimeStart:%s, commitTimeEnd:%s, commitUserName:%s, status:%s\n",
             userId, roleId, deptId, startTime, endTime, commitTimeStart, commitTimeEnd,
             commitUserName, status));
+
+
     try {
       List<Byte> statusList = null;
       statusList = Lists.newArrayList(ActivityConstants.ACTIVITY_STATUS.TO_BE_APPROVE.getValue(), //
@@ -193,18 +232,35 @@ public class ActivityController4OP {
   /**
    * 活动配置/新增 URL: addActivity
    *
-   * @param actGroup
-   * @param activities
-   * @param actExtends
+   * @param req
    * @return
    */
   @RequestMapping(value = "addActivity", method = RequestMethod.POST)
   @ResponseBody
-  public String addActivity(Object actGroup,
-      @RequestParam(value = "activities[]") List<ActActivity> activities, Object actExtends) {
+  public String addActivity(@RequestBody HashMap req, HttpServletRequest request){
 
-    log.info(JSONObject.toJSONString(actGroup));
-    return null;
+    Map param = (Map)req.get("param");
+    log.info(JSONObject.toJSONString(req));
+    ActActivity activity = new ActActivity();
+    activity.setId((String)param.get("activityId")) ;
+    activity.setActivityId((String)param.get("activityId")) ;
+    activity.setActGroupId((String)param.get("actGroupId")) ;
+    activity.setQuaId((String)param.get("quaId")) ;
+    activity.setActivityName((String)param.get("activityName")) ;
+    activity.setStatus((Byte.parseByte((String)param.get("status"))));
+    activity.setDailyMax(Integer.parseInt((String )param.get("dailyMax")));
+    activity.setUserMax(Integer.parseInt((String)param.get("userMax")));
+    activity.setUserDailyMax(Integer.parseInt((String)param.get("userDailyMax"))) ;
+    activity.setDrawRate(Float.parseFloat((String)param.get(" drawRate")));
+    activity.setSeqNumber(Integer.parseInt((String)param.get("seqNumber")));
+    try {
+      activityService.addActivity(null, activity);
+      return "success";
+    }catch (BusinessException e){
+      e.printStackTrace();
+      log.error(String.format("error:%s",e.getLocalizedMessage()));
+    }
+    return "fail";
   }
 
   /**
@@ -224,20 +280,24 @@ public class ActivityController4OP {
   /**
    * 活动提交 commitActivity
    *
-   * @param actGroupId
+   * @param req
+   * @param request
    * @return
    */
   @RequestMapping(value = "commitActivity", method = RequestMethod.POST)
   @ResponseBody
-  public String commitActivity(String actGroupId) {
+//  public String commitActivity(String actGroupId) {
+  public String commitActivity(@RequestBody HashMap req, HttpServletRequest request) {
 
+    Map param = (Map) req.get("param");
+    String actGroupId = (String)param.get("actGroupId");
     try {
       int result = activityService.commitActivity(null, actGroupId);
-      return result == 1 ? "success":"error";
+      return result == 1 ? "success":"fail";
     }catch (BusinessException e){
       log.error(String.format("error:%s", e.getLocalizedMessage()));
     }
-    return null;
+    return "fail";
   }
 
   /**
@@ -257,7 +317,7 @@ public class ActivityController4OP {
       int approvalResult = (int) param.get("approvalResult");
       String approvalMessage = (String) param.get("approvalMessage");
       int result = activityService.approveActivity(null, actGroupId, (byte)approvalResult, approvalMessage);
-      return result == 1 ? "success":"error";
+      return result == 1 ? "success":"fail";
     }catch (BusinessException e){
       log.error(String.format("error:%s", e.getLocalizedMessage()));
     }
@@ -267,13 +327,24 @@ public class ActivityController4OP {
   /**
    * 活动上下线 URL: setActivityOnline
    *
-   * @param actGroupId
-   * @param flag
+   * @param req
+   * @param request
    * @return
    */
   @RequestMapping(value = "setActivityOnline", method = RequestMethod.POST)
-  public String setActivityOnline(String actGroupId, Byte flag) {
-    return null;
+  @ResponseBody
+  public String setActivityOnline(@RequestBody HashMap req, HttpServletRequest request) {
+    Map param = (Map)req.get("param");
+    try {
+      String actGroupId = (String) param.get("actGroupId");
+      int flag = (int) param.get("flag");
+      int result = activityService.setActivityOnline(null, actGroupId, (byte)flag);
+      return result == 1 ? "success":"fail";
+    }catch (BusinessException e){
+      log.error(String.format("error:%s", e.getLocalizedMessage()));
+      //throw e;// TODO
+    }
+    return "fail";
   }
 
   /**

@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -70,9 +72,12 @@ public class ProductController4OP {
    * @param request
    * @return
      */
+  @RequestMapping(value = "listProductsIndex", method = {RequestMethod.POST,RequestMethod.GET})
+  @ResponseBody
   public List<Map> listProductsIndex(String userId, HttpServletRequest request){
 
-    List<ExternalProduct> products = this.queryProductListByUserId(userId, -1, -1);
+//    List<ExternalProduct> products = this.queryProductListByUserId(userId, -1, -1);
+    List<ExternalProduct> products = this.fakeProduct(5);
     if(products == null || products.size() == 0){
       return null;
     }
@@ -116,6 +121,20 @@ public class ProductController4OP {
       map.put("activityName", product.getActivityName());
 
       result.add(map);
+    }
+    return result;
+  }
+
+  private List fakeProduct(int limit){
+    List result = new ArrayList();
+    for(int idx = 1;idx<limit;idx++){
+
+      ExternalProduct obj = new ExternalProduct();
+      obj.setProductId("productId"+idx);
+      obj.setProductName("productName"+idx);
+      obj.setProductType((byte)((idx%3+1)*10));
+
+      result.add(obj);
     }
     return result;
   }
