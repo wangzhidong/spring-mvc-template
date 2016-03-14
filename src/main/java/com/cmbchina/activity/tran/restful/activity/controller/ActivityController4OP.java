@@ -304,7 +304,7 @@ public class ActivityController4OP {
       recommends.add(recommend);
     }
 
-    //TODO
+    //TODO new model
 //    Map cityMap = (Map)param.get("cityList");
 //    keySet = cityMap.keySet();
 //    iterator = keySet.iterator();
