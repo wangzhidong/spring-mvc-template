@@ -74,7 +74,7 @@ public class ProductController4OP {
      */
   @RequestMapping(value = "listProductsIndex", method = {RequestMethod.POST,RequestMethod.GET})
   @ResponseBody
-  public List<Map> listProductsIndex(String userId, HttpServletRequest request){
+  public Map listProductsIndex(String userId, HttpServletRequest request){
 
 //    List<ExternalProduct> products = this.queryProductListByUserId(userId, -1, -1);
     List<ExternalProduct> products = this.fakeProduct(5);
@@ -82,19 +82,23 @@ public class ProductController4OP {
       return null;
     }
 
-    List<Map> result = new ArrayList<Map>();
+    Map result = new HashMap();
     for(ExternalProduct product:products){
       Map map = new HashMap();
       map.put("productId",product.getProductId());
       map.put("productName",product.getProductName());
       map.put("productType",product.getProductType());
-      result.add(map);
+      map.put("sellPrice", product.getSellPrice());
+      map.put("marketPrice", product.getMarketPrice());
+      map.put("stockBalance", product.getStockBalance());
+      map.put("picUrl", "https://www.baidu.com/img/bd_logo1.png"); //TODO 加字段
+      result.put(product.getProductId(), map);
     }
     return result;
   }
 
 
-  public List listProducts(String userId, HttpServletRequest request){
+  public Map listProducts(String userId, HttpServletRequest request){
 
     List<ExternalProduct> products = this.queryProductListByUserId(userId, -1, -1);
 
@@ -102,7 +106,7 @@ public class ProductController4OP {
       return null;
     }
 
-    List<Map> result = new ArrayList<Map>();
+    Map result = new HashMap();
     for(ExternalProduct product:products){
       Map map = new HashMap();
       map.put("productId", product.getProductId());
@@ -120,7 +124,7 @@ public class ProductController4OP {
       map.put("activityId", product.getActivityId());
       map.put("activityName", product.getActivityName());
 
-      result.add(map);
+      result.put(product.getProductId(), product);
     }
     return result;
   }
@@ -133,6 +137,9 @@ public class ProductController4OP {
       obj.setProductId("productId"+idx);
       obj.setProductName("productName"+idx);
       obj.setProductType((byte)((idx%3+1)*10));
+      obj.setSellPrice(120.03);
+      obj.setMarketPrice(150.00);
+      obj.setStockBalance(20000L);
 
       result.add(obj);
     }

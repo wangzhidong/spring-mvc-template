@@ -1,26 +1,42 @@
 package com.cmbchina.activity.tran.restful.activity.controller;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+
+import net.spy.memcached.compat.log.Logger;
+import net.spy.memcached.compat.log.LoggerFactory;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.cmbchina.activity.busi.act.constant.ActivityConstants;
 import com.cmbchina.activity.busi.act.dto.ActActivity;
+import com.cmbchina.activity.busi.act.dto.ActActivityGift;
+import com.cmbchina.activity.busi.act.dto.ActBusiContext;
 import com.cmbchina.activity.busi.act.dto.ActGroup;
+import com.cmbchina.activity.busi.act.dto.ActRecommend;
 import com.cmbchina.activity.busi.act.service.ActivityService;
 import com.cmbchina.activity.busi.common.service.AuthorityService;
 import com.cmbchina.commons.bean.BusinessException;
 import com.cmbchina.commons.util.DateTimeUtils;
+import com.cmbchina.commons.util.KeyGenerator;
 import com.google.common.collect.Lists;
-import net.spy.memcached.compat.log.Logger;
-import net.spy.memcached.compat.log.LoggerFactory;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by wangtingbang on 16/1/13.
@@ -114,18 +130,17 @@ public class ActivityController4OP {
   @RequestMapping(value = "listActivities4Recommend", method = {RequestMethod.GET,
           RequestMethod.POST})
   @ResponseBody
-  public List listActivities4Recommend(@RequestBody HashMap req, HttpServletRequest request) {
+  public Map listActivities4Recommend(@RequestBody HashMap req, HttpServletRequest request) {
 
     if (req == null) {
       return null;
     }
 
 //    Map param = (Map) req.get("param");
+    ActBusiContext context = new ActBusiContext();
     try {
       List<Byte> statusList = Lists.newArrayList(ActivityConstants.ACTIVITY_STATUS.ONLINE.getValue());
-      List result =
-        activityService.listActivities(null, null, null, null, null, null,
-          null, null, null, statusList);
+      Map result = activityService.listActivities4Recommend(context);
 
       return result;
     } catch (BusinessException e) {
@@ -241,20 +256,157 @@ public class ActivityController4OP {
 
     Map param = (Map)req.get("param");
     log.info(JSONObject.toJSONString(req));
-    ActActivity activity = new ActActivity();
-    activity.setId((String)param.get("activityId")) ;
-    activity.setActivityId((String)param.get("activityId")) ;
-    activity.setActGroupId((String)param.get("actGroupId")) ;
-    activity.setQuaId((String)param.get("quaId")) ;
-    activity.setActivityName((String)param.get("activityName")) ;
-    activity.setStatus((Byte.parseByte((String)param.get("status"))));
-    activity.setDailyMax(Integer.parseInt((String )param.get("dailyMax")));
-    activity.setUserMax(Integer.parseInt((String)param.get("userMax")));
-    activity.setUserDailyMax(Integer.parseInt((String)param.get("userDailyMax"))) ;
-    activity.setDrawRate(Float.parseFloat((String)param.get(" drawRate")));
-    activity.setSeqNumber(Integer.parseInt((String)param.get("seqNumber")));
+
+//    String activityId = KeyGenerator.uuid();//((String)param.get("activityId")) ;
+//    String actGroupId = KeyGenerator.uuid();//((String)param.get("actGroupId")) ;
+//    String actGroupName = ((String)param.get("actGroupName")) ;
+//    String quaId = (String)param.get("quaId");
+//    String quaGroupId = (String)param.get("quaGroupId");
+//    String activityName = (String)param.get("activityName");
+//    String activityType = (String)param.get("activityType");
+//    String status = (String)param.get("status");
+
+//    String actGroupIdStr = (String)param.get("actGroupId");
+    String quaGroupIdStr = (String)param.get("quaGroupId");
+    String actGroupNameStr = (String)param.get("actGroupName");
+    String activityTypeStr = (String)param.get("activityType");
+    String onlineTimeStr = (String)param.get("onlineTime");
+    String offlineTimeStr = (String)param.get("offlineTime");
+    String startTimeStr = (String)param.get("startTime");
+    String endTimeStr = (String)param.get("endTime");
+    String channelStr = (String)param.get("channel");
+    String descriptionStr = (String)param.get("description");
+    String statusStr = (String)param.get("status");
+    String picUrlStr = (String)param.get("picUrl");
+    String commitUserIdStr = (String)param.get("commitUserId");
+    String commitUserNameStr = (String)param.get("commitUserName");
+    String commitTimeStr = (String)param.get("commitTime");
+    String approvalUserIdStr = (String)param.get("approvalUserId");
+    String approvalUserNameStr = (String)param.get("approvalUserName");
+    String approvalTimeStr = (String)param.get("approvalTime");
+    
+//    String subActivityRelationStr = (String)param.get("subActivityRelation"); //TODO　子活動間關係
+//    String receiveSuccessText = (String) param.get("receiveSuccessText"); //TODO 領取成功提示
+//    String receiveIneligibleText = (String) param.get("receiveIneligibleText"); //TODO 領取失敗提示（無資格提示）
+    
+    
+    int seqNumber = (int)param.get("rankId");
+
+    Map recommendActIdMap = (Map)param.get("recommendActId");
+    Set keySet = recommendActIdMap.keySet();
+    Iterator iterator = keySet.iterator();
+    List<ActRecommend> recommends = new ArrayList<>();
+    while(iterator.hasNext()){
+      String recommendActId = (String) recommendActIdMap.get(iterator.next());
+      ActRecommend recommend = new ActRecommend();
+      recommend.setId(KeyGenerator.uuid());
+      recommend.setActGroupId(recommendActId);
+      recommends.add(recommend);
+    }
+
+    //TODO
+//    Map cityMap = (Map)param.get("cityList");
+//    keySet = cityMap.keySet();
+//    iterator = keySet.iterator();
+//    List<ActActivityArea> areas = new ArrayList<>();
+//    while(iterator.hasNext()){
+//      String cityId = (String) cityMap.get(iterator.next());
+//      ActActivityArea area = new ActActivityArea();
+//      area.setAreaId(null);
+//      area.setArea(null);
+//      area.setAreaCode(null);
+//      areas.add(area);
+//    }
+
+    JSONArray subActivitiesJArray  = null;
+    List subActivities = new ArrayList();
+
+    if("1".equals((String)param.get("activityType"))) {
+      subActivitiesJArray = (JSONArray) param.get("child");
+      for(Object obj : subActivitiesJArray){
+        Map tmp = (Map)obj;
+        System.out.println(tmp);
+
+        ActActivity actTmp = new ActActivity();
+        actTmp.setQuaId((String)tmp.get("quaId"));
+        actTmp.setActivityName((String)tmp.get("activityName"));
+        actTmp.setStatus(ActivityConstants.ACTIVITY_STATUS.INIT.getValue());
+        actTmp.setDailyMax(Integer.parseInt((String)tmp.get("cycleUnit"))); // 週期類型：１－小時，２－天，３－周，４－月
+        actTmp.setUserMax(((int)tmp.get("cycleMax"))); // 週期內最大量（庫存）
+        actTmp.setUserDailyMax(((int)tmp.get("userCycleMax"))); //週期內用戶最大量
+        actTmp.setSeqNumber(seqNumber);
+        subActivities.add(actTmp);
+      }
+    } else if("2".equals((String)param.get("activityType"))) {
+      subActivitiesJArray = (JSONArray) param.get("childDraw");
+      for(Object obj : subActivitiesJArray){
+        Map tmp = (Map)obj;
+        System.out.println(tmp);
+
+        ActActivity actTmp = new ActActivity();
+        actTmp.setQuaId((String)tmp.get("quaId"));
+        actTmp.setActivityName((String)tmp.get("activityName"));
+        actTmp.setStatus(ActivityConstants.ACTIVITY_STATUS.INIT.getValue());
+        actTmp.setDailyMax(Integer.parseInt((String)tmp.get("cycleUnit"))); // 週期類型：１－小時，２－天，３－周，４－月
+        actTmp.setUserMax(((int)tmp.get("cycleMax"))); // 週期內最大量（庫存）
+        actTmp.setUserDailyMax(((int)tmp.get("userCycleMax"))); //週期內用戶最大量
+        actTmp.setSeqNumber(seqNumber);
+        subActivities.add(actTmp);
+        /**
+         * "cycleUnit": "2",
+         * "cycleMax": 234,
+         * "userCycleMax": 567,
+         * "quaId": "quaId00",
+         * "activityCycle": 12,
+         * "activityName": "抽奖子活动一",
+         * "userMax": 4354
+         */
+//        actTmp.setDrawRate(((float)tmp.get("drawRate")));
+        JSONArray productsJArray = (JSONArray) tmp.get("productList");
+        List<ActActivityGift> gifts = new ArrayList<>();
+        for(Object product : productsJArray){
+          Map prdTmp = (Map)product;
+          float drawRate = Float.valueOf(prdTmp.get("drawRate").toString());
+          String productId = (String) prdTmp.get("productId");
+
+          ActActivityGift gift = new ActActivityGift();
+          gift.setProductId(productId);
+          //gift.setDrawRate / activity.setGiftDrawRate //TODO
+
+        }
+      }
+    }
+    
+    if(true){
+      String dailyMax=( String )param.get("dailyMax");
+      String userMax=(String)param.get("userMax");
+      String userDailyMax=(String)param.get("userDailyMax");
+      String drawRate=(String)param.get(" drawRate");
+    }
+
+    
+
+    ActGroup group = new ActGroup();
+    
+//    group.setActGroupId(actGroupId);//(String actGroupId) {
+    group.setQuaGroupId(quaGroupIdStr);//(String quaGroupId) {
+    group.setActGroupName(actGroupNameStr);//(String actGroupName) {
+    group.setActivityType(Byte.parseByte((String)activityTypeStr));//(Short activityType) {
+    group.setOnlineTime(StringUtils.isEmpty(onlineTimeStr)?null:DateTimeUtils.toDate(onlineTimeStr,"yyyy/MM/dd HH:mm:ss"));//(Date onlineTime) {
+    group.setOfflineTime(StringUtils.isEmpty(offlineTimeStr)?null:DateTimeUtils.toDate(offlineTimeStr,"yyyy/MM/dd HH:mm:ss"));//(Date offlineTime) {
+    group.setStartTime(StringUtils.isEmpty(startTimeStr)?null:DateTimeUtils.toDate(startTimeStr,"yyyy/MM/dd HH:mm:ss"));//(Date startTime) {
+    group.setEndTime(StringUtils.isEmpty(endTimeStr)?null:DateTimeUtils.toDate(endTimeStr,"yyyy/MM/dd HH:mm:ss"));//(Date endTime) {
+    group.setChannel((byte)1);// group.setChannel(Byte.parseByte(channelStr));//(Short channel) {
+    group.setDescription(descriptionStr);//(String description) {
+    group.setStatus(ActivityConstants.ACTIVITY_STATUS.INIT.getValue());//(Byte status) {
+    group.setPicUrl(picUrlStr);//(String picUrl) {
+    group.setCommitUserId(commitUserIdStr);//(String commitUserId) {
+    group.setCommitUserName(commitUserNameStr);//(String commitUserName) {
+    group.setCommitTime(DateTimeUtils.now());//.toDate(commitTimeStr,"yyyy/MM/dd HH:mm:ss"));//(Date commitTime) {
+
     try {
-      activityService.addActivity(null, activity);
+      activityService.addActivity(null, group,subActivities,recommends, null);
+      log.info(JSONObject.toJSONString(group));
       return "success";
     }catch (BusinessException e){
       e.printStackTrace();
