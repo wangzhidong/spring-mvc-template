@@ -9,8 +9,10 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import com.cmbchina.activity.busi.act.dto.*;
+import com.cmbchina.activity.busi.common.dto.AuthUser;
 import net.spy.memcached.compat.log.Logger;
 import net.spy.memcached.compat.log.LoggerFactory;
 
@@ -49,6 +51,16 @@ public class ActivityController4OP {
   @Autowired
   private AuthorityService authorityService;
 
+  public enum OP_TYPE {
+    CREATE((byte) 1), UPDATE((byte) 2);
+
+    byte type;
+
+    OP_TYPE(byte type) {
+      this.type = type;
+    }
+  }
+
   /**
    * 活动列表 URL: listActivities
    *
@@ -57,7 +69,7 @@ public class ActivityController4OP {
    */
   @RequestMapping(value = "listActivities", method = {RequestMethod.GET, RequestMethod.POST})
   @ResponseBody
-  //TODO user role, auth, filter
+  // TODO user role, auth, filter
   public List listAcitivties(@RequestBody HashMap req, HttpServletRequest request) {
     if (req == null) {
       return null;
@@ -67,44 +79,38 @@ public class ActivityController4OP {
     String userId = (String) param.get("userId");
     String roleId = (String) param.get("roleId");
     String deptId = (String) param.get("deptId");
-    Date startTime =
-        param.get("startTime") == null ? null : DateTimeUtils.toDateTime((String) param
-            .get("startTime"));
-    Date endTime =
-        param.get("endTime") == null ? null : DateTimeUtils.toDateTime((String) param
-            .get("endTime"));
-    Date commitTimeStart =
-        param.get("commitTimeStart") == null ? null : DateTimeUtils.toDateTime((String) param
-            .get("commitTimeStart"));
-    Date commitTimeEnd =
-        param.get("commitTimeStart") == null ? null : DateTimeUtils.toDateTime((String) param
-            .get("commitTimeEnd"));
+    Date startTime = param.get("startTime") == null ? null
+        : DateTimeUtils.toDateTime((String) param.get("startTime"));
+    Date endTime = param.get("endTime") == null ? null
+        : DateTimeUtils.toDateTime((String) param.get("endTime"));
+    Date commitTimeStart = param.get("commitTimeStart") == null ? null
+        : DateTimeUtils.toDateTime((String) param.get("commitTimeStart"));
+    Date commitTimeEnd = param.get("commitTimeStart") == null ? null
+        : DateTimeUtils.toDateTime((String) param.get("commitTimeEnd"));
     String commitUserName = (String) param.get("commitUserName");
     String status = (String) param.get("status");
     // String cookies = request.getCookies().toString();
     // String session = request.getSession().toString();
     // log.info("cookies:{}, session:{}", cookies, session);
-    log.info(String
-        .format(
-            "userId:%s, roleId:%s, deptId:%s, startTime:%s,endTime:%s, commitTimeStart:%s, commitTimeEnd:%s, commitUserName:%s, status:%s\n",
-            userId, roleId, deptId, startTime, endTime, commitTimeStart, commitTimeEnd,
-            commitUserName, status));
+    log.info(String.format(
+        "userId:%s, roleId:%s, deptId:%s, startTime:%s,endTime:%s, commitTimeStart:%s, commitTimeEnd:%s, commitUserName:%s, status:%s\n",
+        userId, roleId, deptId, startTime, endTime, commitTimeStart, commitTimeEnd, commitUserName,
+        status));
 
     try {
       List<Byte> statusList;
       if (StringUtils.isEmpty(status)) {
         statusList = Lists.newArrayList(ActivityConstants.ACTIVITY_STATUS.INIT.getValue(), //
             ActivityConstants.ACTIVITY_STATUS.TO_BE_APPROVE.getValue(), //
-            ActivityConstants.ACTIVITY_STATUS.APPROVE_REJECTED.getValue(),//
-            ActivityConstants.ACTIVITY_STATUS.APPROVED.getValue(),//
+            ActivityConstants.ACTIVITY_STATUS.APPROVE_REJECTED.getValue(), //
+            ActivityConstants.ACTIVITY_STATUS.APPROVED.getValue(), //
             ActivityConstants.ACTIVITY_STATUS.ONLINE.getValue(), //
             ActivityConstants.ACTIVITY_STATUS.MANUALLY_OFFLINE.getValue());
       } else {
         statusList = Lists.newArrayList(Byte.parseByte(status));
       }
-      List result =
-          activityService.listActivities(null, userId, roleId, deptId, startTime, endTime,
-              commitTimeStart, commitTimeEnd, commitUserName, statusList);
+      List result = activityService.listActivities(null, userId, roleId, deptId, startTime, endTime,
+          commitTimeStart, commitTimeEnd, commitUserName, statusList);
       return result;
     } catch (BusinessException e) {
       log.error("error:{}", e);
@@ -122,8 +128,8 @@ public class ActivityController4OP {
    * @param request
    * @return
    */
-  @RequestMapping(value = "listActivities4Recommend", method = {RequestMethod.GET,
-          RequestMethod.POST})
+  @RequestMapping(value = "listActivities4Recommend",
+      method = {RequestMethod.GET, RequestMethod.POST})
   @ResponseBody
   public Map listActivities4Recommend(@RequestBody HashMap req, HttpServletRequest request) {
 
@@ -131,10 +137,11 @@ public class ActivityController4OP {
       return null;
     }
 
-//    Map param = (Map) req.get("param");
+    // Map param = (Map) req.get("param");
     ActBusiContext context = new ActBusiContext();
     try {
-      List<Byte> statusList = Lists.newArrayList(ActivityConstants.ACTIVITY_STATUS.ONLINE.getValue());
+      List<Byte> statusList =
+          Lists.newArrayList(ActivityConstants.ACTIVITY_STATUS.ONLINE.getValue());
       Map result = activityService.listActivities4Recommend(context);
 
       return result;
@@ -154,8 +161,8 @@ public class ActivityController4OP {
    * @param request
    * @return
    */
-  @RequestMapping(value = "listActivities4Approval", method = {RequestMethod.GET,
-      RequestMethod.POST})
+  @RequestMapping(value = "listActivities4Approval",
+      method = {RequestMethod.GET, RequestMethod.POST})
   @ResponseBody
   public List listActivities4Approval(@RequestBody HashMap req, HttpServletRequest request) {
     if (req == null) {
@@ -166,39 +173,33 @@ public class ActivityController4OP {
     String userId = (String) param.get("userId");
     String roleId = (String) param.get("roleId");
     String deptId = (String) param.get("deptId");
-    Date startTime =
-        param.get("startTime") == null ? null : DateTimeUtils.toDateTime((String) param
-            .get("startTime"));
-    Date endTime =
-        param.get("endTime") == null ? null : DateTimeUtils.toDateTime((String) param
-            .get("endTime"));
-    Date commitTimeStart =
-        param.get("commitTimeStart") == null ? null : DateTimeUtils.toDateTime((String) param
-            .get("commitTimeStart"));
-    Date commitTimeEnd =
-        param.get("commitTimeStart") == null ? null : DateTimeUtils.toDateTime((String) param
-            .get("commitTimeEnd"));
+    Date startTime = param.get("startTime") == null ? null
+        : DateTimeUtils.toDateTime((String) param.get("startTime"));
+    Date endTime = param.get("endTime") == null ? null
+        : DateTimeUtils.toDateTime((String) param.get("endTime"));
+    Date commitTimeStart = param.get("commitTimeStart") == null ? null
+        : DateTimeUtils.toDateTime((String) param.get("commitTimeStart"));
+    Date commitTimeEnd = param.get("commitTimeStart") == null ? null
+        : DateTimeUtils.toDateTime((String) param.get("commitTimeEnd"));
     String commitUserName = (String) param.get("commitUserName");
     String status = (String) param.get("status");
     // String cookies = request.getCookies().toString();
     // String session = request.getSession().toString();
     // log.info("cookies:{}, session:{}", cookies, session);
-    log.info(String
-        .format(
-            "userId:%s, roleId:%s, deptId:%s, startTime:%s,endTime:%s, commitTimeStart:%s, commitTimeEnd:%s, commitUserName:%s, status:%s\n",
-            userId, roleId, deptId, startTime, endTime, commitTimeStart, commitTimeEnd,
-            commitUserName, status));
+    log.info(String.format(
+        "userId:%s, roleId:%s, deptId:%s, startTime:%s,endTime:%s, commitTimeStart:%s, commitTimeEnd:%s, commitUserName:%s, status:%s\n",
+        userId, roleId, deptId, startTime, endTime, commitTimeStart, commitTimeEnd, commitUserName,
+        status));
 
 
     try {
       List<Byte> statusList = null;
       statusList = Lists.newArrayList(ActivityConstants.ACTIVITY_STATUS.TO_BE_APPROVE.getValue(), //
-          ActivityConstants.ACTIVITY_STATUS.APPROVED.getValue(),//
+          ActivityConstants.ACTIVITY_STATUS.APPROVED.getValue(), //
           ActivityConstants.ACTIVITY_STATUS.ONLINE.getValue()//
-          );
-      List result =
-          activityService.listActivities(null, userId, roleId, deptId, startTime, endTime,
-              commitTimeStart, commitTimeEnd, commitUserName, statusList);
+      );
+      List result = activityService.listActivities(null, userId, roleId, deptId, startTime, endTime,
+          commitTimeStart, commitTimeEnd, commitUserName, statusList);
       return result;
     } catch (BusinessException e) {
       log.error("error:{}", e);
@@ -247,51 +248,52 @@ public class ActivityController4OP {
    */
   @RequestMapping(value = "addActivity", method = RequestMethod.POST)
   @ResponseBody
-  public String addActivity(@RequestBody HashMap req, HttpServletRequest request){
+  public String addActivity(@RequestBody HashMap req, HttpServletRequest request) {
 
-    Map param = (Map)req.get("param");
+    Map param = (Map) req.get("param");
     log.info(JSONObject.toJSONString(req));
 
-//    String activityId = KeyGenerator.uuid();//((String)param.get("activityId")) ;
-    String actGroupId = KeyGenerator.uuid();//((String)param.get("actGroupId")) ;
-//    String actGroupName = ((String)param.get("actGroupName")) ;
-//    String quaId = (String)param.get("quaId");
-//    String quaGroupId = (String)param.get("quaGroupId");
-//    String activityName = (String)param.get("activityName");
-//    String activityType = (String)param.get("activityType");
-//    String status = (String)param.get("status");
+    // String activityId = KeyGenerator.uuid();//((String)param.get("activityId")) ;
+    String actGroupId = KeyGenerator.uuid();// ((String)param.get("actGroupId")) ;
+    // String actGroupName = ((String)param.get("actGroupName")) ;
+    // String quaId = (String)param.get("quaId");
+    // String quaGroupId = (String)param.get("quaGroupId");
+    // String activityName = (String)param.get("activityName");
+    // String activityType = (String)param.get("activityType");
+    // String status = (String)param.get("status");
 
-//    String actGroupIdStr = (String)param.get("actGroupId");
-    String quaGroupIdStr = (String)param.get("quaGroupId");
-    String actGroupNameStr = (String)param.get("actGroupName");
-    String activityTypeStr = (String)param.get("activityType");
-    String onlineTimeStr = (String)param.get("onlineTime");
-    String offlineTimeStr = (String)param.get("offlineTime");
-    String startTimeStr = (String)param.get("startTime");
-    String endTimeStr = (String)param.get("endTime");
-    String channelStr = (String)param.get("channel");
-    String descriptionStr = (String)param.get("description");
-    String statusStr = (String)param.get("status");
-    String picUrlStr = (String)param.get("picUrl");
-    String commitUserIdStr = (String)param.get("commitUserId");
-    String commitUserNameStr = (String)param.get("commitUserName");
-    String commitTimeStr = (String)param.get("commitTime");
-    String approvalUserIdStr = (String)param.get("approvalUserId");
-    String approvalUserNameStr = (String)param.get("approvalUserName");
-    String approvalTimeStr = (String)param.get("approvalTime");
-    
-//    String subActivityRelationStr = (String)param.get("subActivityRelation"); //TODO　子活動間關係
-//    String receiveSuccessText = (String) param.get("receiveSuccessText"); //TODO 領取成功提示
-//    String receiveIneligibleText = (String) param.get("receiveIneligibleText"); //TODO 領取失敗提示（無資格提示）
-    
-    
-    int seqNumber = (int)param.get("rankId");
+    // String actGroupIdStr = (String)param.get("actGroupId");
+    String quaGroupIdStr = (String) param.get("quaGroupId");
+    String actGroupNameStr = (String) param.get("actGroupName");
+    String activityTypeStr = (String) param.get("activityType");
+    String onlineTimeStr = (String) param.get("onlineTime");
+    String offlineTimeStr = (String) param.get("offlineTime");
+    String startTimeStr = (String) param.get("startTime");
+    String endTimeStr = (String) param.get("endTime");
+    String channelStr = (String) param.get("channel");
+    String descriptionStr = (String) param.get("description");
+    String statusStr = (String) param.get("status");
+    String picUrlStr = (String) param.get("picUrl");
+    String commitUserIdStr = (String) param.get("commitUserId");
+    String commitUserNameStr = (String) param.get("commitUserName");
+    String commitTimeStr = (String) param.get("commitTime");
+    String approvalUserIdStr = (String) param.get("approvalUserId");
+    String approvalUserNameStr = (String) param.get("approvalUserName");
+    String approvalTimeStr = (String) param.get("approvalTime");
 
-    Map recommendActIdMap = (Map)param.get("recommendActId");
+    // String subActivityRelationStr = (String)param.get("subActivityRelation"); //TODO 子活動間關係
+    // String receiveSuccessText = (String) param.get("receiveSuccessText"); //TODO 領取成功提示
+    // String receiveIneligibleText = (String) param.get("receiveIneligibleText"); //TODO
+    // 領取失敗提示（無資格提示）
+
+
+    int seqNumber = (int) param.get("rankId");
+
+    Map recommendActIdMap = (Map) param.get("recommendActId");
     Set keySet = recommendActIdMap.keySet();
     Iterator iterator = keySet.iterator();
     List<ActRecommend> recommends = new ArrayList<>();
-    while(iterator.hasNext()){
+    while (iterator.hasNext()) {
       String recommendActId = (String) recommendActIdMap.get(iterator.next());
       ActRecommend recommend = new ActRecommend();
       recommend.setId(KeyGenerator.uuid());
@@ -300,74 +302,74 @@ public class ActivityController4OP {
       recommends.add(recommend);
     }
 
-    //TODO new model
-    Map cityMap = (Map)param.get("cityList");
+    // TODO new model
+    Map cityMap = (Map) param.get("cityList");
     keySet = cityMap.keySet();
     iterator = keySet.iterator();
     List<ActActivityArea> areas = new ArrayList<>();
-    while(iterator.hasNext()){
-      Map city = (Map)cityMap.get(iterator.next());
+    while (iterator.hasNext()) {
+      Map city = (Map) cityMap.get(iterator.next());
       ActActivityArea area = new ActActivityArea();
       area.setActGroupId(actGroupId);
-//      area.setAreaId(null); //TODO
-//      area.setArea(null); //TODO
-//      area.setAreaCode(null); //TODO
-      area.setProvinceId((String)city.get("provinceId"));
-      area.setProvince((String)city.get("provinceName"));
-      area.setCityId((String)city.get("cityId"));
-      area.setCity((String)city.get("cityName"));
+      // area.setAreaId(null); //TODO
+      // area.setArea(null); //TODO
+      // area.setAreaCode(null); //TODO
+      area.setProvinceId((String) city.get("provinceId"));
+      area.setProvince((String) city.get("provinceName"));
+      area.setCityId((String) city.get("cityId"));
+      area.setCity((String) city.get("cityName"));
       areas.add(area);
     }
 
-    JSONArray subActivitiesJArray  = null;
+    JSONArray subActivitiesJArray = null;
     List subActivities = new ArrayList();
     List<ActActivityGift> gifts = new ArrayList<>();
 
 
     // 普通活动
-    if("1".equals((String)param.get("activityType"))) {
+    if ("1".equals((String) param.get("activityType"))) {
       subActivitiesJArray = (JSONArray) param.get("child");
-      for(Object obj : subActivitiesJArray){
+      for (Object obj : subActivitiesJArray) {
         String activityId = KeyGenerator.uuid();
-        Map tmp = (Map)obj;
+        Map tmp = (Map) obj;
         ActActivity actTmp = new ActActivity();
         actTmp.setActivityId(activityId);
         actTmp.setActGroupId(actGroupId);
-        actTmp.setQuaId((String)tmp.get("quaId"));
-        actTmp.setActivityName((String)tmp.get("activityName"));
+        actTmp.setQuaId((String) tmp.get("quaId"));
+        actTmp.setActivityName((String) tmp.get("activityName"));
         actTmp.setStatus(ActivityConstants.ACTIVITY_STATUS.INIT.getValue());
-        actTmp.setDailyMax(Integer.parseInt((String)tmp.get("cycleUnit"))); // 週期類型：１－小時，２－天，３－周，４－月
-        actTmp.setUserMax(((int)tmp.get("cycleMax"))); // 週期內最大量（庫存）
-        actTmp.setUserDailyMax(((int)tmp.get("userCycleMax"))); //週期內用戶最大量
+        actTmp.setDailyMax(Integer.parseInt((String) tmp.get("cycleUnit"))); // 週期類型：１－小時，２－天，３－周，４－月
+        actTmp.setUserMax(((int) tmp.get("cycleMax"))); // 週期內最大量（庫存）
+        actTmp.setUserDailyMax(((int) tmp.get("userCycleMax"))); // 週期內用戶最大量
         actTmp.setSeqNumber(seqNumber);
 
         ActActivityGift gift = new ActActivityGift();
         gift.setActivityId(activityId);
-        gift.setProductId((String)tmp.get("productId"));
+        gift.setProductId((String) tmp.get("productId"));
         subActivities.add(actTmp);
         gifts.add(gift);
       }
     }
     // 抽奖
-    else if("2".equals((String)param.get("activityType"))) {
+    else if ("2".equals((String) param.get("activityType"))) {
       subActivitiesJArray = (JSONArray) param.get("childDraw");
-      for(Object obj : subActivitiesJArray){
+      for (Object obj : subActivitiesJArray) {
         String activityId = KeyGenerator.uuid();
-        Map tmp = (Map)obj;
+        Map tmp = (Map) obj;
         ActActivity actTmp = new ActActivity();
         actTmp.setActivityId(activityId);
         actTmp.setActGroupId(actGroupId);
-        actTmp.setQuaId((String)tmp.get("quaId"));
-        actTmp.setActivityName((String)tmp.get("activityName"));
+        actTmp.setQuaId((String) tmp.get("quaId"));
+        actTmp.setActivityName((String) tmp.get("activityName"));
         actTmp.setStatus(ActivityConstants.ACTIVITY_STATUS.INIT.getValue());
-        actTmp.setDailyMax(Integer.parseInt((String)tmp.get("cycleUnit"))); // 週期類型：１－小時，２－天，３－周，４－月
-        actTmp.setUserMax(((int)tmp.get("cycleMax"))); // 週期內最大量（庫存）
-        actTmp.setUserDailyMax(((int)tmp.get("userCycleMax"))); //週期內用戶最大量
+        actTmp.setDailyMax(Integer.parseInt((String) tmp.get("cycleUnit"))); // 週期類型：１－小時，２－天，３－周，４－月
+        actTmp.setUserMax(((int) tmp.get("cycleMax"))); // 週期內最大量（庫存）
+        actTmp.setUserDailyMax(((int) tmp.get("userCycleMax"))); // 週期內用戶最大量
         actTmp.setSeqNumber(seqNumber);
         subActivities.add(actTmp);
         JSONArray productsJArray = (JSONArray) tmp.get("productList");
-        for(Object product : productsJArray){
-          Map prdTmp = (Map)product;
+        for (Object product : productsJArray) {
+          Map prdTmp = (Map) product;
           float drawRate = Float.valueOf(prdTmp.get("drawRate").toString());
           String productId = (String) prdTmp.get("productId");
 
@@ -379,18 +381,22 @@ public class ActivityController4OP {
         }
       }
     }
-    
+
     ActGroup group = new ActGroup();
-    
-    group.setActGroupId(actGroupId);//(String actGroupId) {
-    group.setQuaGroupId(quaGroupIdStr);//(String quaGroupId) {
-    group.setActGroupName(actGroupNameStr);//(String actGroupName) {
-    group.setActivityType(Byte.parseByte((String)activityTypeStr));//(Short activityType) {
-    group.setOnlineTime(StringUtils.isEmpty(onlineTimeStr)?null:DateTimeUtils.toDate(onlineTimeStr,"yyyy/MM/dd HH:mm:ss"));
-    group.setOfflineTime(StringUtils.isEmpty(offlineTimeStr)?null:DateTimeUtils.toDate(offlineTimeStr,"yyyy/MM/dd HH:mm:ss"));
-    group.setStartTime(StringUtils.isEmpty(startTimeStr)?null:DateTimeUtils.toDate(startTimeStr,"yyyy/MM/dd HH:mm:ss"));
-    group.setEndTime(StringUtils.isEmpty(endTimeStr)?null:DateTimeUtils.toDate(endTimeStr,"yyyy/MM/dd HH:mm:ss"));
-    group.setChannel((byte)1);// group.setChannel(Byte.parseByte(channelStr));
+
+    group.setActGroupId(actGroupId);// (String actGroupId) {
+    group.setQuaGroupId(quaGroupIdStr);// (String quaGroupId) {
+    group.setActGroupName(actGroupNameStr);// (String actGroupName) {
+    group.setActivityType(Byte.parseByte((String) activityTypeStr));// (Short activityType) {
+    group.setOnlineTime(StringUtils.isEmpty(onlineTimeStr) ? null
+        : DateTimeUtils.toDate(onlineTimeStr, "yyyy/MM/dd HH:mm:ss"));
+    group.setOfflineTime(StringUtils.isEmpty(offlineTimeStr) ? null
+        : DateTimeUtils.toDate(offlineTimeStr, "yyyy/MM/dd HH:mm:ss"));
+    group.setStartTime(StringUtils.isEmpty(startTimeStr) ? null
+        : DateTimeUtils.toDate(startTimeStr, "yyyy/MM/dd HH:mm:ss"));
+    group.setEndTime(StringUtils.isEmpty(endTimeStr) ? null
+        : DateTimeUtils.toDate(endTimeStr, "yyyy/MM/dd HH:mm:ss"));
+    group.setChannel((byte) 1);// group.setChannel(Byte.parseByte(channelStr));
     group.setDescription(descriptionStr);
     group.setStatus(ActivityConstants.ACTIVITY_STATUS.INIT.getValue());
     group.setPicUrl(picUrlStr);
@@ -399,12 +405,12 @@ public class ActivityController4OP {
     group.setCommitTime(DateTimeUtils.now());
 
     try {
-      activityService.addActivity(null, group,subActivities,recommends,areas, gifts, null);
+      activityService.addActivity(null, group, subActivities, recommends, areas, gifts, null);
       log.info(JSONObject.toJSONString(group));
       return "success";
-    }catch (BusinessException e){
+    } catch (BusinessException e) {
       e.printStackTrace();
-      log.error(String.format("error:%s",e.getLocalizedMessage()));
+      log.error(String.format("error:%s", e.getLocalizedMessage()));
     }
     return "fail";
   }
@@ -412,14 +418,25 @@ public class ActivityController4OP {
   /**
    * 活动修改 URL: updateActivity
    *
-   * @param actGroup
-   * @param activities
-   * @param actExtends
+   * @param req
+   * @param request
    * @return
    */
   @RequestMapping(value = "updateActivity", method = RequestMethod.POST)
   @ResponseBody
-  public String updateActivity(Object actGroup, List<ActActivity> activities, Object actExtends) {
+  public String updateActivity(HashMap req, HttpServletRequest request) {
+
+    Map param = (Map)req.get("param");
+    String token = null; //TODO
+
+    try {
+      this.processWrite(param, token, OP_TYPE.UPDATE);
+    }catch (BusinessException e){
+      log.error(e.getLocalizedMessage());
+    }catch (Exception e){
+      log.error(e.getLocalizedMessage());
+    }
+
     return null;
   }
 
@@ -432,15 +449,15 @@ public class ActivityController4OP {
    */
   @RequestMapping(value = "commitActivity", method = RequestMethod.POST)
   @ResponseBody
-//  public String commitActivity(String actGroupId) {
+  // public String commitActivity(String actGroupId) {
   public String commitActivity(@RequestBody HashMap req, HttpServletRequest request) {
 
     Map param = (Map) req.get("param");
-    String actGroupId = (String)param.get("actGroupId");
+    String actGroupId = (String) param.get("actGroupId");
     try {
       int result = activityService.commitActivity(null, actGroupId);
-      return result == 1 ? "success":"fail";
-    }catch (BusinessException e){
+      return result == 1 ? "success" : "fail";
+    } catch (BusinessException e) {
       log.error(String.format("error:%s", e.getLocalizedMessage()));
     }
     return "fail";
@@ -454,17 +471,24 @@ public class ActivityController4OP {
    */
   @RequestMapping(value = "approveActivity", method = RequestMethod.POST)
   @ResponseBody
-  public String approveActivity(@RequestBody HashMap req, HttpServletRequest request){ //String actGroupId, Byte approvalResult, String approvalMessage) {
+  public String approveActivity(@RequestBody HashMap req, HttpServletRequest request) { // String
+                                                                                        // actGroupId,
+                                                                                        // Byte
+                                                                                        // approvalResult,
+                                                                                        // String
+                                                                                        // approvalMessage)
+                                                                                        // {
 
 
-    Map param = (Map)req.get("param");
+    Map param = (Map) req.get("param");
     try {
       String actGroupId = (String) param.get("actGroupId");
       int approvalResult = (int) param.get("approvalResult");
       String approvalMessage = (String) param.get("approvalMessage");
-      int result = activityService.approveActivity(null, actGroupId, (byte)approvalResult, approvalMessage);
-      return result == 1 ? "success":"fail";
-    }catch (BusinessException e){
+      int result =
+          activityService.approveActivity(null, actGroupId, (byte) approvalResult, approvalMessage);
+      return result == 1 ? "success" : "fail";
+    } catch (BusinessException e) {
       log.error(String.format("error:%s", e.getLocalizedMessage()));
     }
     return null;
@@ -480,15 +504,15 @@ public class ActivityController4OP {
   @RequestMapping(value = "setActivityOnline", method = RequestMethod.POST)
   @ResponseBody
   public String setActivityOnline(@RequestBody HashMap req, HttpServletRequest request) {
-    Map param = (Map)req.get("param");
+    Map param = (Map) req.get("param");
     try {
       String actGroupId = (String) param.get("actGroupId");
       int flag = (int) param.get("flag");
-      int result = activityService.setActivityOnline(null, actGroupId, (byte)flag);
-      return result == 1 ? "success":"fail";
-    }catch (BusinessException e){
+      int result = activityService.setActivityOnline(null, actGroupId, (byte) flag);
+      return result == 1 ? "success" : "fail";
+    } catch (BusinessException e) {
       log.error(String.format("error:%s", e.getLocalizedMessage()));
-      //throw e;// TODO
+      // throw e;// TODO
     }
     return "fail";
   }
@@ -600,5 +624,210 @@ public class ActivityController4OP {
     System.out.println(param);
     log.info(JSONObject.toJSONString(activities));
     return (JSONObject.toJSONString(activities));
+  }
+
+
+  private int processWrite(Map param, String token, OP_TYPE opType) throws BusinessException {
+    int result = 0;
+
+    // String activityId = KeyGenerator.uuid();//((String)param.get("activityId")) ;
+    String actGroupId = null;
+    if(opType == OP_TYPE.CREATE) {
+      KeyGenerator.uuid();
+    }else if(opType == OP_TYPE.UPDATE) {
+      actGroupId = (String) param.get("actGroupId");
+    }
+    String quaGroupIdStr = (String) param.get("quaGroupId");
+    String actGroupNameStr = (String) param.get("actGroupName");
+    String activityTypeStr = (String) param.get("activityType");
+    String onlineTimeStr = (String) param.get("onlineTime");
+    String offlineTimeStr = (String) param.get("offlineTime");
+    String startTimeStr = (String) param.get("startTime");
+    String endTimeStr = (String) param.get("endTime");
+    // String channelStr = (String) param.get("channel");
+    String descriptionStr = (String) param.get("description");
+    // String statusStr = (String) param.get("status");
+    String picUrlStr = (String) param.get("picUrl");
+    String commitUserIdStr = (String) param.get("commitUserId");
+    String commitUserNameStr = (String) param.get("commitUserName");
+
+    // String subActivityRelationStr = (String)param.get("subActivityRelation"); //TODO 子活動間關係
+    // String receiveSuccessText = (String) param.get("receiveSuccessText"); //TODO 領取成功提示
+    // String receiveIneligibleText = (String) param.get("receiveIneligibleText"); //TODO
+    // 領取失敗提示（無資格提示）
+
+    int seqNumber = (int) param.get("rankId");
+
+    /**
+     * object for write
+     */
+    ActGroup group = new ActGroup();
+    List<ActActivity> subActivities = new ArrayList();
+    List<ActRecommend> recommends = new ArrayList<>();
+    List<ActActivityGift> gifts = new ArrayList<>();
+    List<ActActivityArea> areas = new ArrayList<>();
+
+    Map recommendActIdMap = (Map) param.get("recommendActId");
+    Set keySet = recommendActIdMap.keySet();
+    Iterator iterator = keySet.iterator();
+    while (iterator.hasNext()) {
+      String recommendActId = (String) recommendActIdMap.get(iterator.next());
+      ActRecommend recommend = new ActRecommend();
+      recommend.setId(KeyGenerator.uuid());
+      recommend.setActGroupId(actGroupId);
+      recommend.setRecommendActGroupId(recommendActId);
+      recommends.add(recommend);
+    }
+
+    Map cityMap = (Map) param.get("cityList");
+    keySet = cityMap.keySet();
+    iterator = keySet.iterator();
+    while (iterator.hasNext()) {
+      Map city = (Map) cityMap.get(iterator.next());
+      ActActivityArea area = new ActActivityArea();
+      area.setActGroupId(actGroupId);
+      // area.setAreaId(null); //TODO
+      // area.setArea(null); //TODO
+      // area.setAreaCode(null); //TODO
+      area.setProvinceId((String) city.get("provinceId"));
+      area.setProvince((String) city.get("provinceName"));
+      area.setCityId((String) city.get("cityId"));
+      area.setCity((String) city.get("cityName"));
+      areas.add(area);
+    }
+
+    JSONArray subActivitiesJArray = null;
+    // 普通活动
+    if ("1".equals((String) param.get("activityType"))) {
+      subActivitiesJArray = (JSONArray) param.get("child");
+      for (Object obj : subActivitiesJArray) {
+        String activityId = null;
+        Map tmp = (Map) obj;
+        if(opType == OP_TYPE.CREATE){
+          activityId = KeyGenerator.uuid();
+        }else if(opType == OP_TYPE.UPDATE){
+          activityId = (String)tmp.get("actType");
+        }
+        ActActivity actTmp = new ActActivity();
+        actTmp.setActivityId(activityId);
+        actTmp.setActGroupId(actGroupId);
+        actTmp.setQuaId((String) tmp.get("quaId"));
+        actTmp.setActivityName((String) tmp.get("activityName"));
+        actTmp.setStatus(ActivityConstants.ACTIVITY_STATUS.INIT.getValue());
+        actTmp.setDailyMax(Integer.parseInt((String) tmp.get("cycleUnit"))); // 週期類型：１－小時，２－天，３－周，４－月
+        actTmp.setUserMax(((int) tmp.get("cycleMax"))); // 週期內最大量（庫存）
+        actTmp.setUserDailyMax(((int) tmp.get("userCycleMax"))); // 週期內用戶最大量
+        actTmp.setSeqNumber(seqNumber);
+
+        ActActivityGift gift = new ActActivityGift();
+        gift.setActivityId(activityId);
+        gift.setProductId((String) tmp.get("productId"));
+        subActivities.add(actTmp);
+        gifts.add(gift);
+      }
+    }
+    // 抽奖
+    else if ("2".equals((String) param.get("activityType"))) {
+      subActivitiesJArray = (JSONArray) param.get("childDraw");
+      for (Object obj : subActivitiesJArray) {
+        String activityId = null;
+        Map tmp = (Map) obj;
+        if(opType == OP_TYPE.CREATE){
+          activityId = KeyGenerator.uuid();
+        }else if(opType == OP_TYPE.UPDATE){
+          activityId = (String)tmp.get("actType");
+        }
+        ActActivity actTmp = new ActActivity();
+        actTmp.setActivityId(activityId);
+        actTmp.setActGroupId(actGroupId);
+        actTmp.setQuaId((String) tmp.get("quaId"));
+        actTmp.setActivityName((String) tmp.get("activityName"));
+        actTmp.setStatus(ActivityConstants.ACTIVITY_STATUS.INIT.getValue());
+        actTmp.setDailyMax(Integer.parseInt((String) tmp.get("cycleUnit"))); // 週期類型：１－小時，２－天，３－周，４－月
+        actTmp.setUserMax(((int) tmp.get("cycleMax"))); // 週期內最大量（庫存）
+        actTmp.setUserDailyMax(((int) tmp.get("userCycleMax"))); // 週期內用戶最大量
+        actTmp.setSeqNumber(seqNumber);
+        subActivities.add(actTmp);
+        JSONArray productsJArray = (JSONArray) tmp.get("productList");
+        for (Object product : productsJArray) {
+          Map prdTmp = (Map) product;
+          float drawRate = Float.valueOf(prdTmp.get("drawRate").toString());
+          String productId = (String) prdTmp.get("productId");
+
+          ActActivityGift gift = new ActActivityGift();
+          gift.setActivityId(activityId);
+          gift.setProductId(productId);
+          gift.setDrawRate(drawRate);
+          gifts.add(gift);
+        }
+      }
+    }
+
+    group.setActGroupId(actGroupId);
+    group.setQuaGroupId(quaGroupIdStr);
+    group.setActGroupName(actGroupNameStr);
+    group.setActivityType(Byte.parseByte(activityTypeStr));
+    group.setOnlineTime(StringUtils.isEmpty(onlineTimeStr) ? null
+        : DateTimeUtils.toDate(onlineTimeStr, DateTimeUtils.Pattern.CMBCHINA_FORMATE_TIME));
+    group.setOfflineTime(StringUtils.isEmpty(offlineTimeStr) ? null
+        : DateTimeUtils.toDate(offlineTimeStr, DateTimeUtils.Pattern.CMBCHINA_FORMATE_TIME));
+    group.setStartTime(StringUtils.isEmpty(startTimeStr) ? null
+        : DateTimeUtils.toDate(startTimeStr, DateTimeUtils.Pattern.CMBCHINA_FORMATE_TIME));
+    group.setEndTime(StringUtils.isEmpty(endTimeStr) ? null
+        : DateTimeUtils.toDate(endTimeStr, DateTimeUtils.Pattern.CMBCHINA_FORMATE_TIME));
+    group.setChannel((byte) 1);
+    group.setDescription(descriptionStr);
+    group.setStatus(ActivityConstants.ACTIVITY_STATUS.INIT.getValue());
+    group.setPicUrl(picUrlStr);
+    group.setCommitUserId(commitUserIdStr);
+    group.setCommitUserName(commitUserNameStr);
+    group.setCommitTime(DateTimeUtils.now());
+
+
+    ActBusiContext context = this.getTransContext(null, token);
+
+    try {
+      switch (opType){
+        case CREATE:{
+          activityService.addActivity(context, group, subActivities, recommends, areas, gifts, null);
+          break;
+        }
+        case UPDATE:{
+          activityService.updateActivity(context, group, subActivities, recommends, areas, gifts,
+            null);
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+//      log.info(JSONObject.toJSONString(group));
+    } catch (BusinessException e) {
+      e.printStackTrace();
+      log.error(String.format("error:%s", e.getLocalizedMessage()));
+    }
+    return result;
+  }
+
+  //TODO AOP
+  private ActBusiContext getTransContext(HttpSession session, String token) throws BusinessException{
+    ActBusiContext context = new ActBusiContext();
+
+    if (token == null) {
+      if(session == null){
+        throw new BusinessException("", new NullPointerException().getMessage()); //TODO
+      }
+      token = (String) session.getAttribute("token");
+    }
+    AuthUser user = authorityService.getUserByToken(token);
+
+    context.setRequestSeqNo(KeyGenerator.uuid()); //TODO
+    context.setOperatorUserId(user.getUserId());
+    context.setOperatorUserName(user.getUserName());
+    context.setOperatorDeptId(user.getDeptId());
+    context.setOperatorDeptName(user.getDeptName());
+    context.setOperatorRoleId(user.getRoleId());
+
+    return context;
   }
 }
