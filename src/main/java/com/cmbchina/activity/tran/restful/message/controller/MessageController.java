@@ -1,5 +1,6 @@
 package com.cmbchina.activity.tran.restful.message.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.cmbchina.activity.busi.common.dto.AuthUser;
 import com.cmbchina.activity.busi.common.dto.ComBusiContext;
 import com.cmbchina.activity.busi.common.dto.ComMessage;
@@ -57,6 +58,8 @@ public class MessageController {
   public int addMessage(Object message, HttpServletRequest request) throws BusinessException{
 
     ComBusiContext context = new ComBusiContext(); //TODO
+
+    log.info(JSONObject.toJSONString(message));
 
     int result = -1;
 

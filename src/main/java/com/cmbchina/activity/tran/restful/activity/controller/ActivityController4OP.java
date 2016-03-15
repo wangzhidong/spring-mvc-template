@@ -281,12 +281,10 @@ public class ActivityController4OP {
     String approvalUserNameStr = (String) param.get("approvalUserName");
     String approvalTimeStr = (String) param.get("approvalTime");
     String subActivityRelationStr = (String)param.get("subActivityRelation"); //TODO 子活動間關係
-    // String receiveSuccessText = (String) param.get("receiveSuccessText"); //TODO 領取成功提示
-    // String receiveIneligibleText = (String) param.get("receiveIneligibleText"); //TODO
-    // 領取失敗提示（無資格提示）
-
-
+    String receiveSuccessText = (String) param.get("receiveSuccessText"); //TODO 領取成功提示
+    String receiveIneligibleText = (String) param.get("receiveIneligibleText"); //TODO 領取失敗提示（無資格提示）
     int seqNumber = (int) param.get("rankId");
+
 
     Map recommendActIdMap = (Map) param.get("recommendActId");
     Set keySet = recommendActIdMap.keySet();
@@ -324,6 +322,19 @@ public class ActivityController4OP {
     List subActivities = new ArrayList();
     List<ActActivityGift> gifts = new ArrayList<>();
 
+    List<ActActivityConfig> configs = new ArrayList<>();
+    ActActivityConfig config0 = new ActActivityConfig();
+    config0.setObjectName(ActGroup.class.getName().toString());
+    config0.setObjectId(actGroupId);
+    config0.setMetaKey("receiveIneligibleText");
+    config0.setMetaValue(receiveIneligibleText);
+    ActActivityConfig config1 = new ActActivityConfig();
+    config1.setObjectName(ActGroup.class.getName().toString());
+    config1.setObjectId(actGroupId);
+    config1.setMetaKey("receiveSuccessText");
+    config1.setMetaValue(receiveSuccessText);
+    configs.add(config0);
+    configs.add(config1);
 
     // 普通活动
     if ("1".equals((String) param.get("activityType"))) {
@@ -337,10 +348,15 @@ public class ActivityController4OP {
         actTmp.setQuaId((String) tmp.get("quaId"));
         actTmp.setActivityName((String) tmp.get("activityName"));
         actTmp.setStatus(ActivityConstants.ACTIVITY_STATUS.INIT.getValue());
-        actTmp.setDailyMax(Integer.parseInt((String) tmp.get("cycleUnit"))); // 週期類型：１－小時，２－天，３－周，４－月
-        actTmp.setUserMax(((int) tmp.get("cycleMax"))); // 週期內最大量（庫存）
-        actTmp.setUserDailyMax(((int) tmp.get("userCycleMax"))); // 週期內用戶最大量
+        actTmp.setCycleUnit(Byte.parseByte((String) tmp.get("cycleUnit"))); // 週期類型：１－小時，２－天，３－周，４－月
+        actTmp.setCycleMax(((int) tmp.get("cycleMax"))); // 週期內最大量（庫存）
+        actTmp.setUserCycleMax(((int) tmp.get("userCycleMax"))); // 週期內用戶最大量
         actTmp.setSeqNumber(seqNumber);
+        ActActivityConfig config = new ActActivityConfig();
+        config.setObjectName(ActActivity.class.getName().toString());
+        config.setObjectId(activityId);
+        config.setMetaKey("buttonText");
+        config.setMetaValue((String)tmp.get("buttonText"));
 
         ActActivityGift gift = new ActActivityGift();
         gift.setActivityId(activityId);
@@ -361,9 +377,9 @@ public class ActivityController4OP {
         actTmp.setQuaId((String) tmp.get("quaId"));
         actTmp.setActivityName((String) tmp.get("activityName"));
         actTmp.setStatus(ActivityConstants.ACTIVITY_STATUS.INIT.getValue());
-        actTmp.setDailyMax(Integer.parseInt((String) tmp.get("cycleUnit"))); // 週期類型：１－小時，２－天，３－周，４－月
-        actTmp.setUserMax(((int) tmp.get("cycleMax"))); // 週期內最大量（庫存）
-        actTmp.setUserDailyMax(((int) tmp.get("userCycleMax"))); // 週期內用戶最大量
+        actTmp.setCycleUnit(Byte.parseByte((String) tmp.get("cycleUnit"))); // 週期類型：１－小時，２－天，３－周，４－月
+        actTmp.setCycleMax(((int) tmp.get("cycleMax"))); // 週期內最大量（庫存）
+        actTmp.setUserCycleMax(((int) tmp.get("userCycleMax"))); // 週期內用戶最大量
         actTmp.setSeqNumber(seqNumber);
         subActivities.add(actTmp);
         JSONArray productsJArray = (JSONArray) tmp.get("productList");
@@ -715,9 +731,9 @@ public class ActivityController4OP {
         actTmp.setQuaId((String) tmp.get("quaId"));
         actTmp.setActivityName((String) tmp.get("activityName"));
         actTmp.setStatus(ActivityConstants.ACTIVITY_STATUS.INIT.getValue());
-        actTmp.setDailyMax(Integer.parseInt((String) tmp.get("cycleUnit"))); // 週期類型：１－小時，２－天，３－周，４－月
-        actTmp.setUserMax(((int) tmp.get("cycleMax"))); // 週期內最大量（庫存）
-        actTmp.setUserDailyMax(((int) tmp.get("userCycleMax"))); // 週期內用戶最大量
+        actTmp.setCycleUnit(Byte.parseByte((String) tmp.get("cycleUnit"))); // 週期類型：１－小時，２－天，３－周，４－月
+        actTmp.setCycleMax(((int) tmp.get("cycleMax"))); // 週期內最大量（庫存）
+        actTmp.setUserCycleMax(((int) tmp.get("userCycleMax"))); // 週期內用戶最大量
         actTmp.setSeqNumber(seqNumber);
 
         ActActivityGift gift = new ActActivityGift();
@@ -744,9 +760,9 @@ public class ActivityController4OP {
         actTmp.setQuaId((String) tmp.get("quaId"));
         actTmp.setActivityName((String) tmp.get("activityName"));
         actTmp.setStatus(ActivityConstants.ACTIVITY_STATUS.INIT.getValue());
-        actTmp.setDailyMax(Integer.parseInt((String) tmp.get("cycleUnit"))); // 週期類型：１－小時，２－天，３－周，４－月
-        actTmp.setUserMax(((int) tmp.get("cycleMax"))); // 週期內最大量（庫存）
-        actTmp.setUserDailyMax(((int) tmp.get("userCycleMax"))); // 週期內用戶最大量
+        actTmp.setCycleUnit(Byte.parseByte((String) tmp.get("cycleUnit"))); // 週期類型：１－小時，２－天，３－周，４－月
+        actTmp.setCycleMax(((int) tmp.get("cycleMax"))); // 週期內最大量（庫存）
+        actTmp.setUserCycleMax(((int) tmp.get("userCycleMax"))); // 週期內用戶最大量
         actTmp.setSeqNumber(seqNumber);
         subActivities.add(actTmp);
         JSONArray productsJArray = (JSONArray) tmp.get("productList");
