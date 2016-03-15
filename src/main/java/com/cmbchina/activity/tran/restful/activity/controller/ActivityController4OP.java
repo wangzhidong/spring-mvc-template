@@ -249,8 +249,8 @@ public class ActivityController4OP {
   @ResponseBody
   public String addActivity(@RequestBody HashMap req, HttpServletRequest request) {
 
-    Map param = (Map) req.get("param");
     log.info(JSONObject.toJSONString(req));
+    Map param = (Map) req.get("param");
 
     // String activityId = KeyGenerator.uuid();//((String)param.get("activityId")) ;
     String actGroupId = KeyGenerator.uuid();// ((String)param.get("actGroupId")) ;
@@ -285,12 +285,16 @@ public class ActivityController4OP {
     int seqNumber = (int) param.get("rankId");
 
 
-    Map recommendActIdMap = (Map) param.get("recommendActId");
-    Set keySet = recommendActIdMap.keySet();
-    Iterator iterator = keySet.iterator();
+    Set keySet;
+    Iterator iterator;
+
     List<ActRecommend> recommends = new ArrayList<>();
-    while (iterator.hasNext()) {
-      String recommendActId = (String) recommendActIdMap.get(iterator.next());
+    JSONArray recommendActIdJArray = (JSONArray) param.get("recommendActId");
+    for(Object obj : recommendActIdJArray){
+      String recommendActId = (String) obj;
+//    Map recommendActIdMap = (Map) param.get("recommendActId");
+//    while (iterator.hasNext()) {
+//      String recommendActId = (String) recommendActIdMap.get(iterator.next());
       ActRecommend recommend = new ActRecommend();
       recommend.setId(KeyGenerator.uuid());
       recommend.setActGroupId(actGroupId);
@@ -689,16 +693,19 @@ public class ActivityController4OP {
     List<ActActivityGift> gifts = new ArrayList<>();
     List<ActActivityArea> areas = new ArrayList<>();
 
+    Set keySet;
+    Iterator iterator;
+
     JSONArray recommendActIdJArray = (JSONArray) param.get("recommendActId");
     for(Object obj : recommendActIdJArray){
-      JSONObject recommendActIdJson = (JSONObject) obj;
-      System.out.println(recommendActIdJson);
-    }
-    Map recommendActIdMap = (Map) param.get("recommendActId");
-    Set keySet = recommendActIdMap.keySet();
-    Iterator iterator = keySet.iterator();
-    while (iterator.hasNext()) {
-      String recommendActId = (String) recommendActIdMap.get(iterator.next());
+      String recommendActId = (String) obj;
+//      System.out.println(recommendActId);
+//    }
+//    JSONArray recommendActIdMap = (JSONArray) param.get("recommendActId");
+//    Set keySet = recommendActIdMap.keySet();
+//    Iterator iterator = keySet.iterator();
+//    while (iterator.hasNext()) {
+//      String recommendActId = (String) recommendActIdMap.get(iterator.next());
       ActRecommend recommend = new ActRecommend();
       recommend.setId(KeyGenerator.uuid());
       recommend.setActGroupId(actGroupId);
