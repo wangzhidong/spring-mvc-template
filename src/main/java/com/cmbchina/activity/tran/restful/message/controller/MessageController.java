@@ -69,7 +69,7 @@ public class MessageController {
 
     Map param = (Map)req.get("param");
     String commitUserId = (String)param.get("commitUserId");
-    Byte messageType = Byte.parseByte((String) param.get("messageType"));
+    Short messageType = Short.parseShort((String) param.get("messageType"));
     Date commitTime = DateTimeUtils.now();//(String)param.get("commitUserId");
     Byte channel = Byte.parseByte((String) param.get("channel"));
     String description = (String)param.get("description");
