@@ -280,8 +280,7 @@ public class ActivityController4OP {
     String approvalUserIdStr = (String) param.get("approvalUserId");
     String approvalUserNameStr = (String) param.get("approvalUserName");
     String approvalTimeStr = (String) param.get("approvalTime");
-
-    // String subActivityRelationStr = (String)param.get("subActivityRelation"); //TODO 子活動間關係
+    String subActivityRelationStr = (String)param.get("subActivityRelation"); //TODO 子活動間關係
     // String receiveSuccessText = (String) param.get("receiveSuccessText"); //TODO 領取成功提示
     // String receiveIneligibleText = (String) param.get("receiveIneligibleText"); //TODO
     // 領取失敗提示（無資格提示）
@@ -389,16 +388,18 @@ public class ActivityController4OP {
     group.setActGroupName(actGroupNameStr);// (String actGroupName) {
     group.setActivityType(Byte.parseByte((String) activityTypeStr));// (Short activityType) {
     group.setOnlineTime(StringUtils.isEmpty(onlineTimeStr) ? null
-        : DateTimeUtils.toDate(onlineTimeStr, "yyyy/MM/dd HH:mm:ss"));
+      : DateTimeUtils.toDate(onlineTimeStr, "yyyy/MM/dd HH:mm:ss"));
     group.setOfflineTime(StringUtils.isEmpty(offlineTimeStr) ? null
-        : DateTimeUtils.toDate(offlineTimeStr, "yyyy/MM/dd HH:mm:ss"));
+      : DateTimeUtils.toDate(offlineTimeStr, "yyyy/MM/dd HH:mm:ss"));
     group.setStartTime(StringUtils.isEmpty(startTimeStr) ? null
-        : DateTimeUtils.toDate(startTimeStr, "yyyy/MM/dd HH:mm:ss"));
+      : DateTimeUtils.toDate(startTimeStr, "yyyy/MM/dd HH:mm:ss"));
     group.setEndTime(StringUtils.isEmpty(endTimeStr) ? null
-        : DateTimeUtils.toDate(endTimeStr, "yyyy/MM/dd HH:mm:ss"));
+      : DateTimeUtils.toDate(endTimeStr, "yyyy/MM/dd HH:mm:ss"));
     group.setChannel((byte) 1);// group.setChannel(Byte.parseByte(channelStr));
     group.setDescription(descriptionStr);
     group.setStatus(ActivityConstants.ACTIVITY_STATUS.INIT.getValue());
+    group.setSeqNumber(seqNumber);
+    group.setSubActivityRelation(Byte.parseByte(subActivityRelationStr));
     group.setPicUrl(picUrlStr);
     group.setCommitUserId(commitUserIdStr);
     group.setCommitUserName(commitUserNameStr);
@@ -651,7 +652,7 @@ public class ActivityController4OP {
     String commitUserIdStr = (String) param.get("commitUserId");
     String commitUserNameStr = (String) param.get("commitUserName");
 
-    // String subActivityRelationStr = (String)param.get("subActivityRelation"); //TODO 子活動間關係
+    String subActivityRelationStr = (String)param.get("subActivityRelation"); //TODO 子活動間關係
     // String receiveSuccessText = (String) param.get("receiveSuccessText"); //TODO 領取成功提示
     // String receiveIneligibleText = (String) param.get("receiveIneligibleText"); //TODO
     // 領取失敗提示（無資格提示）
@@ -768,16 +769,18 @@ public class ActivityController4OP {
     group.setActGroupName(actGroupNameStr);
     group.setActivityType(Byte.parseByte(activityTypeStr));
     group.setOnlineTime(StringUtils.isEmpty(onlineTimeStr) ? null
-        : DateTimeUtils.toDate(onlineTimeStr, DateTimeUtils.Pattern.CMBCHINA_FORMATE_TIME));
+      : DateTimeUtils.toDate(onlineTimeStr, DateTimeUtils.Pattern.CMBCHINA_FORMATE_TIME));
     group.setOfflineTime(StringUtils.isEmpty(offlineTimeStr) ? null
-        : DateTimeUtils.toDate(offlineTimeStr, DateTimeUtils.Pattern.CMBCHINA_FORMATE_TIME));
+      : DateTimeUtils.toDate(offlineTimeStr, DateTimeUtils.Pattern.CMBCHINA_FORMATE_TIME));
     group.setStartTime(StringUtils.isEmpty(startTimeStr) ? null
-        : DateTimeUtils.toDate(startTimeStr, DateTimeUtils.Pattern.CMBCHINA_FORMATE_TIME));
+      : DateTimeUtils.toDate(startTimeStr, DateTimeUtils.Pattern.CMBCHINA_FORMATE_TIME));
     group.setEndTime(StringUtils.isEmpty(endTimeStr) ? null
-        : DateTimeUtils.toDate(endTimeStr, DateTimeUtils.Pattern.CMBCHINA_FORMATE_TIME));
+      : DateTimeUtils.toDate(endTimeStr, DateTimeUtils.Pattern.CMBCHINA_FORMATE_TIME));
     group.setChannel((byte) 1);
     group.setDescription(descriptionStr);
     group.setStatus(ActivityConstants.ACTIVITY_STATUS.INIT.getValue());
+    group.setSeqNumber(seqNumber);
+    group.setSubActivityRelation(Byte.parseByte(subActivityRelationStr));
     group.setPicUrl(picUrlStr);
     group.setCommitUserId(commitUserIdStr);
     group.setCommitUserName(commitUserNameStr);
