@@ -87,7 +87,7 @@ public class ActivityController4OP {
         : DateTimeUtils.toDateTime((String) param.get("commitTimeStart"));
     Date commitTimeEnd = param.get("commitTimeStart") == null ? null
         : DateTimeUtils.toDateTime((String) param.get("commitTimeEnd"));
-    String commitUserName = (String) param.get("commitUserName");
+    String commitUserName = null;//TODO (String) param.get("commitUserName");
     String status = (String) param.get("status");
     // String cookies = request.getCookies().toString();
     // String session = request.getSession().toString();
@@ -181,7 +181,7 @@ public class ActivityController4OP {
         : DateTimeUtils.toDateTime((String) param.get("commitTimeStart"));
     Date commitTimeEnd = param.get("commitTimeStart") == null ? null
         : DateTimeUtils.toDateTime((String) param.get("commitTimeEnd"));
-    String commitUserName = (String) param.get("commitUserName");
+    String commitUserName = null;// TODO (String) param.get("commitUserName");
     String status = (String) param.get("status");
     // String cookies = request.getCookies().toString();
     // String session = request.getSession().toString();
@@ -218,19 +218,18 @@ public class ActivityController4OP {
    */
   @RequestMapping(value = "getActivityInfo", method = {RequestMethod.POST, RequestMethod.GET})
   @ResponseBody
-  public Map findActivity(String actGroupId) {
-
+  public Map findActivity(@RequestBody HashMap req, HttpServletRequest request) {
+    String actGroupId = (String)((Map)req.get("param")).get("actGroupId");
+    
     try {
-      ActGroup group = activityService.getActGroupById(null, actGroupId);
+//      ActGroup group = activityService.getActGroupById(null, actGroupId);
+//
+//      List<ActActivity> activities = activityService.listActByGroupId(null, actGroupId);
 
-      List<ActActivity> activities = activityService.listActByGroupId(null, actGroupId);
+      //TODO context
+      Map result = activityService.getActivity(null, actGroupId);
 
-      Map result = new HashMap();
-
-      result.put("group", group);
-      result.put("activities", activities);
-
-      log.info(JSONObject.toJSONString(result));
+//      log.info(JSONObject.toJSONString(result));
       return result;
     } catch (BusinessException e) {
       e.printStackTrace();
@@ -441,8 +440,11 @@ public class ActivityController4OP {
    */
   @RequestMapping(value = "updateActivity", method = RequestMethod.POST)
   @ResponseBody
-  public String updateActivity(HashMap req, HttpServletRequest request) {
+  public String updateActivity(@RequestBody HashMap req, HttpServletRequest request) {
 
+    if(log.isDebugEnabled()){
+      log.debug(req);
+    }
     Map param = (Map)req.get("param");
     String token = null; //TODO
 
@@ -450,8 +452,11 @@ public class ActivityController4OP {
       this.processWrite(param, token, OP_TYPE.UPDATE);
     }catch (BusinessException e){
       log.error(e.getLocalizedMessage());
+      log.error(e.getStackTrace());
     }catch (Exception e){
       log.error(e.getLocalizedMessage());
+      log.error(e.getStackTrace());
+      e.printStackTrace();
     }
 
     return null;
@@ -656,7 +661,7 @@ public class ActivityController4OP {
     }
     String quaGroupIdStr = (String) param.get("quaGroupId");
     String actGroupNameStr = (String) param.get("actGroupName");
-    String activityTypeStr = (String) param.get("activityType");
+    int activityTypeVar = (int)param.get("activityType");
     String onlineTimeStr = (String) param.get("onlineTime");
     String offlineTimeStr = (String) param.get("offlineTime");
     String startTimeStr = (String) param.get("startTime");
@@ -668,7 +673,7 @@ public class ActivityController4OP {
     String commitUserIdStr = (String) param.get("commitUserId");
     String commitUserNameStr = (String) param.get("commitUserName");
 
-    String subActivityRelationStr = (String)param.get("subActivityRelation"); //TODO 子活動間關係
+    int subActivityRelationVar = (int)param.get("subActivityRelation"); //TODO 子活動間關係
     // String receiveSuccessText = (String) param.get("receiveSuccessText"); //TODO 領取成功提示
     // String receiveIneligibleText = (String) param.get("receiveIneligibleText"); //TODO
     // 領取失敗提示（無資格提示）
@@ -684,6 +689,11 @@ public class ActivityController4OP {
     List<ActActivityGift> gifts = new ArrayList<>();
     List<ActActivityArea> areas = new ArrayList<>();
 
+    JSONArray recommendActIdJArray = (JSONArray) param.get("recommendActId");
+    for(Object obj : recommendActIdJArray){
+      JSONObject recommendActIdJson = (JSONObject) obj;
+      System.out.println(recommendActIdJson);
+    }
     Map recommendActIdMap = (Map) param.get("recommendActId");
     Set keySet = recommendActIdMap.keySet();
     Iterator iterator = keySet.iterator();
@@ -783,7 +793,7 @@ public class ActivityController4OP {
     group.setActGroupId(actGroupId);
     group.setQuaGroupId(quaGroupIdStr);
     group.setActGroupName(actGroupNameStr);
-    group.setActivityType(Byte.parseByte(activityTypeStr));
+    group.setActivityType((byte)activityTypeVar);
     group.setOnlineTime(StringUtils.isEmpty(onlineTimeStr) ? null
       : DateTimeUtils.toDate(onlineTimeStr, DateTimeUtils.Pattern.CMBCHINA_FORMATE_TIME));
     group.setOfflineTime(StringUtils.isEmpty(offlineTimeStr) ? null
@@ -796,7 +806,7 @@ public class ActivityController4OP {
     group.setDescription(descriptionStr);
     group.setStatus(ActivityConstants.ACTIVITY_STATUS.INIT.getValue());
     group.setSeqNumber(seqNumber);
-    group.setSubActivityRelation(Byte.parseByte(subActivityRelationStr));
+    group.setSubActivityRelation((byte)subActivityRelationVar);
     group.setPicUrl(picUrlStr);
     group.setCommitUserId(commitUserIdStr);
     group.setCommitUserName(commitUserNameStr);
