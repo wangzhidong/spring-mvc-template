@@ -1,5 +1,6 @@
 package com.cmbchina.activity.tran.restful.common.controller;
 
+import com.alibaba.fastjson.JSONArray;
 import com.cmbchina.activity.busi.common.dto.AuthUser;
 import com.cmbchina.activity.busi.common.dto.ComBusiContext;
 import com.cmbchina.activity.busi.common.dto.ComUser;
@@ -39,18 +40,31 @@ public class CommonUserController {
   /**
    * 部门人员列表，主要面向资格平台
    * 
-   * @param page
-   * @param limit
-   * @param deptId
-   * @param roleList
+   * @param req
    * @param request
    * @return
    */
   @RequestMapping(value = "listUsersByDept", method = RequestMethod.POST)
   @ResponseBody
-  public List<Map> listUsersByDept(int page, int limit, String deptId, Byte[] roleList,
-      HttpServletRequest request) {
+  public List<Map> listUsersByDept(@RequestBody HashMap req,
+      HttpServletRequest request) throws Exception{
 
+    if(req==null){
+      log.error("req is null");
+      throw new IllegalArgumentException();
+    }
+    Map param = (Map)req.get("param");
+    if(param==null){
+      log.error("param is null");
+      throw new IllegalArgumentException();
+    }
+
+    int page = 1;
+    int limit = 10;
+    String deptId = (String)param.get("deptId");
+    JSONArray roleListJArr = (JSONArray) param.get("roleList");
+//    Byte[] roleList = new Byte[roleListStr.size()];
+//    roleListStr.toArray(roleList);
     ComBusiContext commonContext = new ComBusiContext();
     commonContext.setRequestSeqNo("EXTR" + DateTimeUtils.now()); // TODO seqNo-gen
 
@@ -63,23 +77,28 @@ public class CommonUserController {
     String requestedSessionId = request.getRequestedSessionId();
     Integer remotePort = request.getRemotePort();
 
-    List<Byte> role_s = Lists.newArrayList(roleList);
-
-    List<ComUser> users = comUserService.listUserByDept(commonContext, deptId, role_s, page, limit);
-
-    if (users == null || users.size() == 0) {
-      return null;
+    List<Byte> role_s = new ArrayList();//Lists.newArrayList(roleList);
+    for(int idx =0;idx<roleListJArr.size();idx++){
+      byte var = ((Number)roleListJArr.get(idx)).byteValue();
+//      role_s.add((Number)roleListJArr.get(idx));
+      role_s.add(var);
     }
 
-    List<Map> result = new ArrayList<Map>();
-    for (ComUser user : users) {
-      Map<String, Object> map = new HashMap<String, Object>();
-      map.put("userId", user.getUserId());
-      map.put("userName", user.getUserName());
-      map.put("roleId", user.getRoleId());
+    List<Map> result = comUserService.listUserByDept(commonContext, deptId, role_s);
 
-      result.add(map);
-    }
+//    if (users == null || users.size() == 0) {
+//      return null;
+//    }
+//
+//    List<Map> result = new ArrayList<Map>();
+//    for (Map user : users) {
+//      Map<String, Object> map = new HashMap<String, Object>();
+//      map.put("userId", user.get("userId"));
+//      map.put("userName", user.get("userName"));
+//      map.put("roleId", user.get("roleId"));
+//
+//      result.add(map);
+//    }
 
     return result;
   }
@@ -91,12 +110,12 @@ public class CommonUserController {
    * @param limit
    * @return
    */
-  @RequestMapping(value = "listUsersByDept", method = RequestMethod.GET)
-  @ResponseBody
-  public Object listUsersByDept(String deptId, int page, int limit){
-    List roles = Lists.newArrayList(1,2,3);
-    return comUserService.listUserByDept(null,deptId,roles,page,limit);
-  }
+//  @RequestMapping(value = "listUsersByDept", method = RequestMethod.GET)
+//  @ResponseBody
+//  public Object listUsersByDept(String deptId, int page, int limit){
+//    List roles = Lists.newArrayList(1,2,3);
+//    return comUserService.listUserByDept(null,deptId,roles,page,limit);
+//  }
 
   /**
    * 用户添加
