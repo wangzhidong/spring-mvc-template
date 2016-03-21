@@ -11,12 +11,15 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import com.cmbchina.activity.busi.act.dto.*;
-import com.cmbchina.activity.busi.common.dto.AuthUser;
-import net.spy.memcached.compat.log.Logger;
-import net.spy.memcached.compat.log.LoggerFactory;
-
+import com.cmbchina.activity.busi.common.constant.MessageConstants;
+import com.cmbchina.activity.busi.common.dto.ComMessage;
+import com.cmbchina.activity.busi.common.service.ComMessageService;
+import com.cmbchina.activity.busi.external.dto.ExternalProduct;
+import com.cmbchina.activity.busi.external.service.ExternalProductService;
+import com.cmbchina.commons.bean.exception.BusinessExceptionDic;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,7 +31,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.cmbchina.activity.busi.act.constant.ActivityConstants;
+import com.cmbchina.activity.busi.act.dto.ActActivity;
+import com.cmbchina.activity.busi.act.dto.ActActivityArea;
+import com.cmbchina.activity.busi.act.dto.ActActivityConfig;
+import com.cmbchina.activity.busi.act.dto.ActActivityGift;
+import com.cmbchina.activity.busi.act.dto.ActBusiContext;
+import com.cmbchina.activity.busi.act.dto.ActGroup;
+import com.cmbchina.activity.busi.act.dto.ActRecommend;
 import com.cmbchina.activity.busi.act.service.ActivityService;
+import com.cmbchina.activity.busi.common.dto.AuthUser;
 import com.cmbchina.activity.busi.common.service.AuthorityService;
 import com.cmbchina.commons.bean.BusinessException;
 import com.cmbchina.commons.util.DateTimeUtils;
@@ -50,6 +61,12 @@ public class ActivityController4OP {
 
   @Autowired
   private AuthorityService authorityService;
+
+  @Autowired
+  private ExternalProductService externalProductService;
+
+  @Autowired
+  private ComMessageService messageService;
 
   public enum OP_TYPE {
     CREATE((byte) 1), UPDATE((byte) 2);
@@ -87,7 +104,7 @@ public class ActivityController4OP {
         : DateTimeUtils.toDateTime((String) param.get("commitTimeStart"));
     Date commitTimeEnd = param.get("commitTimeStart") == null ? null
         : DateTimeUtils.toDateTime((String) param.get("commitTimeEnd"));
-    String commitUserName = null;//TODO (String) param.get("commitUserName");
+    String commitUserName = null;// TODO (String) param.get("commitUserName");
     String status = (String) param.get("status");
     // String cookies = request.getCookies().toString();
     // String session = request.getSession().toString();
@@ -213,23 +230,23 @@ public class ActivityController4OP {
   /**
    * 活动查看 URL: getActivityInfo
    *
-   * @param actGroupId
+   * @param req
    * @return
    */
   @RequestMapping(value = "getActivityInfo", method = {RequestMethod.POST, RequestMethod.GET})
   @ResponseBody
   public Map findActivity(@RequestBody HashMap req, HttpServletRequest request) {
-    String actGroupId = (String)((Map)req.get("param")).get("actGroupId");
-    
-    try {
-//      ActGroup group = activityService.getActGroupById(null, actGroupId);
-//
-//      List<ActActivity> activities = activityService.listActByGroupId(null, actGroupId);
+    String actGroupId = (String) ((Map) req.get("param")).get("actGroupId");
 
-      //TODO context
+    try {
+      // ActGroup group = activityService.getActGroupById(null, actGroupId);
+      //
+      // List<ActActivity> activities = activityService.listActByGroupId(null, actGroupId);
+
+      // TODO context
       Map result = activityService.getActivity(null, actGroupId);
 
-//      log.info(JSONObject.toJSONString(result));
+      // log.info(JSONObject.toJSONString(result));
       return result;
     } catch (BusinessException e) {
       e.printStackTrace();
@@ -245,9 +262,9 @@ public class ActivityController4OP {
    * @param req
    * @return
    */
-  @RequestMapping(value = "addActivity", method = RequestMethod.POST)
+  @RequestMapping(value = "addActivityTmp", method = RequestMethod.POST)
   @ResponseBody
-  public String addActivity(@RequestBody HashMap req, HttpServletRequest request) {
+  public String addActivityTmp(@RequestBody HashMap req, HttpServletRequest request) {
 
     log.info(JSONObject.toJSONString(req));
     Map param = (Map) req.get("param");
@@ -264,7 +281,7 @@ public class ActivityController4OP {
     // String actGroupIdStr = (String)param.get("actGroupId");
     String quaGroupIdStr = (String) param.get("quaGroupId");
     String actGroupNameStr = (String) param.get("actGroupName");
-    String activityTypeStr = (String) param.get("activityType");
+//    String activityTypeStr = (String) param.get("activityType");
     String onlineTimeStr = (String) param.get("onlineTime");
     String offlineTimeStr = (String) param.get("offlineTime");
     String startTimeStr = (String) param.get("startTime");
@@ -272,6 +289,7 @@ public class ActivityController4OP {
     String channelStr = (String) param.get("channel");
     String descriptionStr = (String) param.get("description");
     String statusStr = (String) param.get("status");
+    Byte activityTypeVar = ((Number)param.get("activityType")).byteValue();
     String picUrlStr = (String) param.get("picUrl");
     String commitUserIdStr = (String) param.get("commitUserId");
     String commitUserNameStr = (String) param.get("commitUserName");
@@ -279,9 +297,10 @@ public class ActivityController4OP {
     String approvalUserIdStr = (String) param.get("approvalUserId");
     String approvalUserNameStr = (String) param.get("approvalUserName");
     String approvalTimeStr = (String) param.get("approvalTime");
-    String subActivityRelationStr = (String)param.get("subActivityRelation"); //TODO 子活動間關係
-    String receiveSuccessText = (String) param.get("receiveSuccessText"); //TODO 領取成功提示
-    String receiveIneligibleText = (String) param.get("receiveIneligibleText"); //TODO 領取失敗提示（無資格提示）
+//    String subActivityRelationStr = (String) param.get("subActivityRelation"); // TODO 子活動間關係
+    String receiveSuccessText = (String) param.get("receiveSuccessText"); // TODO 領取成功提示
+    String receiveIneligibleText = (String) param.get("receiveIneligibleText"); // TODO
+                                                                                // 領取失敗提示（無資格提示）
     int seqNumber = (int) param.get("rankId");
 
 
@@ -290,11 +309,11 @@ public class ActivityController4OP {
 
     List<ActRecommend> recommends = new ArrayList<>();
     JSONArray recommendActIdJArray = (JSONArray) param.get("recommendActId");
-    for(Object obj : recommendActIdJArray){
+    for (Object obj : recommendActIdJArray) {
       String recommendActId = (String) obj;
-//    Map recommendActIdMap = (Map) param.get("recommendActId");
-//    while (iterator.hasNext()) {
-//      String recommendActId = (String) recommendActIdMap.get(iterator.next());
+      // Map recommendActIdMap = (Map) param.get("recommendActId");
+      // while (iterator.hasNext()) {
+      // String recommendActId = (String) recommendActIdMap.get(iterator.next());
       ActRecommend recommend = new ActRecommend();
       recommend.setId(KeyGenerator.uuid());
       recommend.setActGroupId(actGroupId);
@@ -340,7 +359,8 @@ public class ActivityController4OP {
     configs.add(config1);
 
     // 普通活动
-    if ("1".equals((String) param.get("activityType"))) {
+//    if ("1".equals((String) param.get("activityType"))) {
+    if(ActivityConstants.ACTIVITY_TYPE.GENERAL.getValue().equals(activityTypeVar)){
       subActivitiesJArray = (JSONArray) param.get("child");
       for (Object obj : subActivitiesJArray) {
         String activityId = KeyGenerator.uuid();
@@ -351,15 +371,17 @@ public class ActivityController4OP {
         actTmp.setQuaId((String) tmp.get("quaId"));
         actTmp.setActivityName((String) tmp.get("activityName"));
         actTmp.setStatus(ActivityConstants.ACTIVITY_STATUS.INIT.getValue());
+        actTmp.setActivityCycle(((Number)tmp.get("activityCycle")).intValue());
         actTmp.setCycleUnit(Byte.parseByte((String) tmp.get("cycleUnit"))); // 週期類型：１－小時，２－天，３－周，４－月
         actTmp.setCycleMax(((int) tmp.get("cycleMax"))); // 週期內最大量（庫存）
         actTmp.setUserCycleMax(((int) tmp.get("userCycleMax"))); // 週期內用戶最大量
+        actTmp.setUserMax(((Number)tmp.get("userMax")).intValue());
         actTmp.setSeqNumber(seqNumber);
         ActActivityConfig config = new ActActivityConfig();
         config.setObjectName(ActActivity.class.getName().toString());
         config.setObjectId(activityId);
         config.setMetaKey("buttonText");
-        config.setMetaValue((String)tmp.get("buttonText"));
+        config.setMetaValue((String) tmp.get("buttonText"));
 
         ActActivityGift gift = new ActActivityGift();
         gift.setActivityId(activityId);
@@ -380,9 +402,11 @@ public class ActivityController4OP {
         actTmp.setQuaId((String) tmp.get("quaId"));
         actTmp.setActivityName((String) tmp.get("activityName"));
         actTmp.setStatus(ActivityConstants.ACTIVITY_STATUS.INIT.getValue());
+        actTmp.setActivityCycle(((Number)tmp.get("activityCycle")).intValue());
         actTmp.setCycleUnit(Byte.parseByte((String) tmp.get("cycleUnit"))); // 週期類型：１－小時，２－天，３－周，４－月
         actTmp.setCycleMax(((int) tmp.get("cycleMax"))); // 週期內最大量（庫存）
         actTmp.setUserCycleMax(((int) tmp.get("userCycleMax"))); // 週期內用戶最大量
+        actTmp.setUserMax(((Number)tmp.get("userMax")).intValue());
         actTmp.setSeqNumber(seqNumber);
         subActivities.add(actTmp);
         JSONArray productsJArray = (JSONArray) tmp.get("productList");
@@ -405,20 +429,20 @@ public class ActivityController4OP {
     group.setActGroupId(actGroupId);// (String actGroupId) {
     group.setQuaGroupId(quaGroupIdStr);// (String quaGroupId) {
     group.setActGroupName(actGroupNameStr);// (String actGroupName) {
-    group.setActivityType(Byte.parseByte((String) activityTypeStr));// (Short activityType) {
+    group.setActivityType(((Number) param.get("activityType")).byteValue());// (Short activityType) {
     group.setOnlineTime(StringUtils.isEmpty(onlineTimeStr) ? null
-      : DateTimeUtils.toDate(onlineTimeStr, "yyyy/MM/dd HH:mm:ss"));
+        : DateTimeUtils.toDate(onlineTimeStr, "yyyy/MM/dd HH:mm:ss"));
     group.setOfflineTime(StringUtils.isEmpty(offlineTimeStr) ? null
-      : DateTimeUtils.toDate(offlineTimeStr, "yyyy/MM/dd HH:mm:ss"));
+        : DateTimeUtils.toDate(offlineTimeStr, "yyyy/MM/dd HH:mm:ss"));
     group.setStartTime(StringUtils.isEmpty(startTimeStr) ? null
-      : DateTimeUtils.toDate(startTimeStr, "yyyy/MM/dd HH:mm:ss"));
+        : DateTimeUtils.toDate(startTimeStr, "yyyy/MM/dd HH:mm:ss"));
     group.setEndTime(StringUtils.isEmpty(endTimeStr) ? null
-      : DateTimeUtils.toDate(endTimeStr, "yyyy/MM/dd HH:mm:ss"));
+        : DateTimeUtils.toDate(endTimeStr, "yyyy/MM/dd HH:mm:ss"));
     group.setChannel((byte) 1);// group.setChannel(Byte.parseByte(channelStr));
     group.setDescription(descriptionStr);
     group.setStatus(ActivityConstants.ACTIVITY_STATUS.INIT.getValue());
     group.setSeqNumber(seqNumber);
-    group.setSubActivityRelation(Byte.parseByte(subActivityRelationStr));
+    group.setSubActivityRelation(((Number)param.get("subActivityRelation")).byteValue());
     group.setPicUrl(picUrlStr);
     group.setCommitUserId(commitUserIdStr);
     group.setCommitUserName(commitUserNameStr);
@@ -436,6 +460,35 @@ public class ActivityController4OP {
   }
 
   /**
+   * 活动新增 URL: addActivity
+   *
+   * @param req
+   * @param request
+   * @return
+   */
+  @RequestMapping(value = "addActivity", method = RequestMethod.POST)
+  @ResponseBody
+  public String addActivity(@RequestBody HashMap req, HttpServletRequest request) {
+
+    if (log.isDebugEnabled()) {
+      log.debug("request body:{}",req);
+    }
+    Map param = (Map) req.get("param");
+    String token = null; // TODO
+
+    try {
+      this.processWrite(param, token, OP_TYPE.CREATE);
+    } catch (BusinessException e) {
+//      log.error(String.format("error:%s",e.getLocalizedMessage()));
+      log.error("Exceptioin:{} ==>", e);
+    } catch (Exception e) {
+      log.error("Exceptioin:{} ==>", e);
+    }
+
+    return null;
+  } 
+  
+  /**
    * 活动修改 URL: updateActivity
    *
    * @param req
@@ -446,21 +499,19 @@ public class ActivityController4OP {
   @ResponseBody
   public String updateActivity(@RequestBody HashMap req, HttpServletRequest request) {
 
-    if(log.isDebugEnabled()){
-      log.debug(req);
+    if (log.isDebugEnabled()) {
+      log.debug("request body:{}",req);
     }
-    Map param = (Map)req.get("param");
-    String token = null; //TODO
+    Map param = (Map) req.get("param");
+    String token = null; // TODO
 
     try {
       this.processWrite(param, token, OP_TYPE.UPDATE);
-    }catch (BusinessException e){
-      log.error(e.getLocalizedMessage());
-      log.error(e.getStackTrace());
-    }catch (Exception e){
-      log.error(e.getLocalizedMessage());
-      log.error(e.getStackTrace());
-      e.printStackTrace();
+    } catch (BusinessException e) {
+//      log.error(String.format("error:%s",e.getLocalizedMessage()));
+      log.error("Exceptioin:{} ==>", e);
+    } catch (Exception e) {
+      log.error("Exceptioin:{} ==>", e);
     }
 
     return null;
@@ -481,7 +532,30 @@ public class ActivityController4OP {
     Map param = (Map) req.get("param");
     String actGroupId = (String) param.get("actGroupId");
     try {
+
+      List<String> productIds = activityService.getActivityGiftIdsByParam(actGroupId,null);
+
+      Map producutCheckMap = externalProductService.checkProductStatusFromOMS(productIds);
+
+      log.info("product check result:{}", producutCheckMap);
+
       int result = activityService.commitActivity(null, actGroupId);
+
+      if(result == 1 ){ //TODO
+        ComMessage message = new ComMessage();
+
+        Short messageType = MessageConstants.MESSAGE_TYPE.CODE_100.getValue();
+        String messageDesc = MessageConstants.MESSAGE_TYPE.CODE_100.getDesc();
+        ActGroup actGroup = activityService.getActGroupById(null, actGroupId); //TODO
+        message.setUserId(actGroup.getCommitUserId()); //TODO 查询归属关系
+        message.setMessageType(messageType);
+        message.setDescription(messageDesc);
+        message.setCommitTime(DateTimeUtils.now());
+        message.setCommitUserId(null);
+
+        messageService.addMessage(null, message);
+      }
+
       return result == 1 ? "success" : "fail";
     } catch (BusinessException e) {
       log.error(String.format("error:%s", e.getLocalizedMessage()));
@@ -497,14 +571,8 @@ public class ActivityController4OP {
    */
   @RequestMapping(value = "approveActivity", method = RequestMethod.POST)
   @ResponseBody
-  public String approveActivity(@RequestBody HashMap req, HttpServletRequest request) { // String
-                                                                                        // actGroupId,
-                                                                                        // Byte
-                                                                                        // approvalResult,
-                                                                                        // String
-                                                                                        // approvalMessage)
-                                                                                        // {
-
+  public String approveActivity(@RequestBody HashMap req, HttpServletRequest request) {
+   // String actGroupId, Byt approvalResult, String approvalMessage
 
     Map param = (Map) req.get("param");
     try {
@@ -513,10 +581,30 @@ public class ActivityController4OP {
       String approvalMessage = (String) param.get("approvalMessage");
       int result =
           activityService.approveActivity(null, actGroupId, (byte) approvalResult, approvalMessage);
+
+      if(result == 1 ){ //TODO
+        ComMessage message = new ComMessage();
+
+        Short messageType = approvalResult == 1?MessageConstants.MESSAGE_TYPE.CODE_101.getValue()
+          :MessageConstants.MESSAGE_TYPE.CODE_102.getValue();
+        String messageDesc = approvalResult == 1?MessageConstants.MESSAGE_TYPE.CODE_101.getDesc()
+          :MessageConstants.MESSAGE_TYPE.CODE_102.getDesc();
+        ActGroup actGroup = activityService.getActGroupById(null, actGroupId); //TODO
+        message.setUserId(actGroup.getCommitUserId());
+        message.setMessageType(messageType);
+        message.setDescription(messageDesc);
+        message.setCommitTime(DateTimeUtils.now());
+        message.setCommitUserId(null); //TODO
+
+        messageService.addMessage(null, message);
+      }
+
       return result == 1 ? "success" : "fail";
     } catch (BusinessException e) {
       log.error(String.format("error:%s", e.getLocalizedMessage()));
     }
+
+
     return null;
   }
 
@@ -586,86 +674,23 @@ public class ActivityController4OP {
     return null;
   }
 
-  @RequestMapping(value = "testPostMan", method = RequestMethod.POST)
-  @ResponseBody
-  public List<String> testPostMan(@RequestParam(value = "argvs") List<String> argv) {
-    return argv;
-  }
-
-  @RequestMapping(value = "testPostManString", method = RequestMethod.POST)
-  @ResponseBody
-  public List<String> testPostMan(String argv) {
-    return Lists.newArrayList(argv);
-  }
-
-  @RequestMapping(value = "testPostManArray", method = RequestMethod.POST)
-  @ResponseBody
-  public List<String> testPostMan(@RequestParam(value = "argv[]") String[] argv) {
-    return Lists.newArrayList(argv);
-  }
-
-  @RequestMapping(value = "testPostManReturnArray", method = RequestMethod.POST)
-  @ResponseBody
-  public Object[] testPostManReturnArray(String argv) {
-    return Lists.newArrayList(argv, argv + argv).toArray();
-  }
-
-  @RequestMapping(value = "testPostManGetList", method = RequestMethod.POST)
-  @ResponseBody
-  public Object[] testPostManGetList(@RequestParam(value = "argv[]") List<String> argv) {
-    log.info(argv);
-    return argv.toArray();
-  }
-
-  @RequestMapping(value = "addActivityTestVo", method = RequestMethod.POST)
-  @ResponseBody
-  public String addActivityTest(@RequestBody @RequestParam(value = "group") ActGroup group,
-      @RequestBody @RequestParam(value = "activities") ActActivity activities) {
-
-    log.info(JSONObject.toJSONString(group));
-    log.info(JSONObject.toJSONString(activities));
-    return (JSONObject.toJSONString(activities));
-  }
-
-  @RequestMapping(value = "addActivityTestMap", method = RequestMethod.POST)
-  @ResponseBody
-  public String addActivityTest(@RequestBody HashMap activities) {
-
-    log.info("param:----->>>", JSONObject.toJSONString(activities));
-    Object param = activities.get("param");
-    log.info(param);
-    System.out.println(param);
-    // return (JSONObject.toJSONString(activities)+"||"+JSONObject.toJSONString(group));
-    return (JSONObject.toJSONString(activities));
-  }
-
-  @RequestMapping(value = "addActivityTestSingleVo", method = RequestMethod.POST)
-  @ResponseBody
-  public String addActivityTest(@RequestBody ActActivity activities) {
-    // public String addActivityTest(@RequestBody @RequestParam(value = "activities")ActActivity
-    // activities) {
-
-    Object param = activities.getActivityId();
-    log.info(param);
-    System.out.println(param);
-    log.info(JSONObject.toJSONString(activities));
-    return (JSONObject.toJSONString(activities));
-  }
-
-
   private int processWrite(Map param, String token, OP_TYPE opType) throws BusinessException {
     int result = 0;
 
     // String activityId = KeyGenerator.uuid();//((String)param.get("activityId")) ;
     String actGroupId = null;
-    if(opType == OP_TYPE.CREATE) {
-      KeyGenerator.uuid();
-    }else if(opType == OP_TYPE.UPDATE) {
+    if (opType == OP_TYPE.CREATE) {
+    	actGroupId = KeyGenerator.uuid();
+    } else if (opType == OP_TYPE.UPDATE) {
       actGroupId = (String) param.get("actGroupId");
+      if(StringUtils.isEmpty(actGroupId)){
+        log.error("opType:{}, error:{}", opType, BusinessExceptionDic.EX_GNR_NULL_PARAM);
+        throw BusinessExceptionDic.EX_GNR_NULL_PARAM;
+      }
     }
     String quaGroupIdStr = (String) param.get("quaGroupId");
     String actGroupNameStr = (String) param.get("actGroupName");
-    int activityTypeVar = (int)param.get("activityType");
+    Byte activityTypeVar = ((Number) param.get("activityType")).byteValue();
     String onlineTimeStr = (String) param.get("onlineTime");
     String offlineTimeStr = (String) param.get("offlineTime");
     String startTimeStr = (String) param.get("startTime");
@@ -677,10 +702,9 @@ public class ActivityController4OP {
     String commitUserIdStr = (String) param.get("commitUserId");
     String commitUserNameStr = (String) param.get("commitUserName");
 
-    int subActivityRelationVar = (int)param.get("subActivityRelation"); //TODO 子活動間關係
-    // String receiveSuccessText = (String) param.get("receiveSuccessText"); //TODO 領取成功提示
-    // String receiveIneligibleText = (String) param.get("receiveIneligibleText"); //TODO
-    // 領取失敗提示（無資格提示）
+    int subActivityRelationVar = (int) param.get("subActivityRelation"); // TODO 子活動間關係
+     String receiveSuccessText = (String) param.get("receiveSuccessText"); //TODO 領取成功提示
+     String receiveIneligibleText = (String) param.get("receiveIneligibleText"); //TODO 領取失敗提示（無資格提示）
 
     int seqNumber = (int) param.get("rankId");
 
@@ -696,21 +720,33 @@ public class ActivityController4OP {
     Set keySet;
     Iterator iterator;
 
-    JSONArray recommendActIdJArray = (JSONArray) param.get("recommendActId");
-    for(Object obj : recommendActIdJArray){
-      String recommendActId = (String) obj;
-//      System.out.println(recommendActId);
-//    }
-//    JSONArray recommendActIdMap = (JSONArray) param.get("recommendActId");
-//    Set keySet = recommendActIdMap.keySet();
-//    Iterator iterator = keySet.iterator();
-//    while (iterator.hasNext()) {
-//      String recommendActId = (String) recommendActIdMap.get(iterator.next());
-      ActRecommend recommend = new ActRecommend();
-      recommend.setId(KeyGenerator.uuid());
-      recommend.setActGroupId(actGroupId);
-      recommend.setRecommendActGroupId(recommendActId);
-      recommends.add(recommend);
+    // JSONArray recommendActIdJArray = (JSONArray) param.get("recommendActId");
+    Object recommendActIdParam = param.get("recommendActId");
+
+    // TODO
+    if (recommendActIdParam instanceof JSONArray) {
+      JSONArray recommendActIdJArray = (JSONArray) recommendActIdParam;
+      for (Object obj : recommendActIdJArray) {
+        String recommendActId = (String) obj;
+        ActRecommend recommend = new ActRecommend();
+        recommend.setId(KeyGenerator.uuid());
+        recommend.setActGroupId(actGroupId);
+        recommend.setRecommendActGroupId(recommendActId);
+        recommends.add(recommend);
+      }
+    }
+    if (recommendActIdParam instanceof JSONObject) {
+      Map recommendActIdMap = (Map) recommendActIdParam;
+      keySet = recommendActIdMap.keySet();
+      iterator = keySet.iterator();
+      while (iterator.hasNext()) {
+        String recommendActId = (String) recommendActIdMap.get(iterator.next());
+        ActRecommend recommend = new ActRecommend();
+        recommend.setId(KeyGenerator.uuid());
+        recommend.setActGroupId(actGroupId);
+        recommend.setRecommendActGroupId(recommendActId);
+        recommends.add(recommend);
+      }
     }
 
     Map cityMap = (Map) param.get("cityList");
@@ -719,6 +755,9 @@ public class ActivityController4OP {
     while (iterator.hasNext()) {
       Map city = (Map) cityMap.get(iterator.next());
       ActActivityArea area = new ActActivityArea();
+      if(opType.equals(OP_TYPE.UPDATE)){
+        area.setId((String)city.get("areaKey"));
+      }
       area.setActGroupId(actGroupId);
       // area.setAreaId(null); //TODO
       // area.setArea(null); //TODO
@@ -730,68 +769,105 @@ public class ActivityController4OP {
       areas.add(area);
     }
 
+    List<ActActivityConfig> configs = new ArrayList<>();
+    ActActivityConfig config0 = new ActActivityConfig();
+    config0.setObjectName(ActGroup.class.getName().toString());
+    config0.setObjectId(actGroupId);
+    config0.setMetaKey("receiveIneligibleText");
+    config0.setMetaValue(receiveIneligibleText);
+    ActActivityConfig config1 = new ActActivityConfig();
+    config1.setObjectName(ActGroup.class.getName().toString());
+    config1.setObjectId(actGroupId);
+    config1.setMetaKey("receiveSuccessText");
+    config1.setMetaValue(receiveSuccessText);
+    configs.add(config0);
+    configs.add(config1);
+    
     JSONArray subActivitiesJArray = null;
     // 普通活动
-    if ("1".equals((String) param.get("activityType"))) {
+    if(ActivityConstants.ACTIVITY_TYPE.GENERAL.getValue().equals(activityTypeVar)){
+//    }
+//    if ("1".equals((String) param.get("activityType"))) {
       subActivitiesJArray = (JSONArray) param.get("child");
       for (Object obj : subActivitiesJArray) {
         String activityId = null;
         Map tmp = (Map) obj;
-        if(opType == OP_TYPE.CREATE){
+        if (opType == OP_TYPE.CREATE) {
           activityId = KeyGenerator.uuid();
-        }else if(opType == OP_TYPE.UPDATE){
-          activityId = (String)tmp.get("actType");
+        } else if (opType == OP_TYPE.UPDATE) {
+          activityId = (String) tmp.get("activityId");
         }
         ActActivity actTmp = new ActActivity();
         actTmp.setActivityId(activityId);
         actTmp.setActGroupId(actGroupId);
         actTmp.setQuaId((String) tmp.get("quaId"));
         actTmp.setActivityName((String) tmp.get("activityName"));
-        actTmp.setStatus(ActivityConstants.ACTIVITY_STATUS.INIT.getValue());
-        actTmp.setCycleUnit(Byte.parseByte((String) tmp.get("cycleUnit"))); // 週期類型：１－小時，２－天，３－周，４－月
-        actTmp.setCycleMax(((int) tmp.get("cycleMax"))); // 週期內最大量（庫存）
-        actTmp.setUserCycleMax(((int) tmp.get("userCycleMax"))); // 週期內用戶最大量
+        actTmp.setStatus(ActivityConstants.ACTIVITY_STATUS.INIT.getValue()); //TODO
+        actTmp.setActivityCycle(((Number)tmp.get("activityCycle")).intValue());
+        actTmp.setCycleUnit(((Number) tmp.get("cycleUnit")).byteValue()); // 週期類型：１－小時，２－天，３－周，４－月
+        actTmp.setCycleMax(((Number) tmp.get("cycleMax")).intValue()); // 週期內最大量（庫存）
+        actTmp.setUserCycleMax(((Number) tmp.get("userCycleMax")).intValue()); // 週期內用戶最大量
+        actTmp.setUserMax(((Number)tmp.get("userMax")).intValue());
         actTmp.setSeqNumber(seqNumber);
-
+        ActActivityConfig config = new ActActivityConfig();
+        config.setObjectName(ActActivity.class.getName().toString());
+        config.setObjectId(activityId);
+        config.setMetaKey("buttonText");
+        config.setMetaValue((String) tmp.get("buttonText"));
+        configs.add(config);
         ActActivityGift gift = new ActActivityGift();
         gift.setActivityId(activityId);
+        if(opType.equals(OP_TYPE.UPDATE)){
+          gift.setId((String) tmp.get("productKey"));
+        }
         gift.setProductId((String) tmp.get("productId"));
         subActivities.add(actTmp);
         gifts.add(gift);
       }
     }
     // 抽奖
-    else if ("2".equals((String) param.get("activityType"))) {
+    else if(ActivityConstants.ACTIVITY_TYPE.DRAW.getValue().equals(activityTypeVar)){
+//    else if ("2".equals((String) param.get("activityType"))) {
       subActivitiesJArray = (JSONArray) param.get("childDraw");
       for (Object obj : subActivitiesJArray) {
         String activityId = null;
         Map tmp = (Map) obj;
-        if(opType == OP_TYPE.CREATE){
+        if (opType == OP_TYPE.CREATE) {
           activityId = KeyGenerator.uuid();
-        }else if(opType == OP_TYPE.UPDATE){
-          activityId = (String)tmp.get("actType");
+        } else if (opType == OP_TYPE.UPDATE) {
+          activityId = (String) tmp.get("activityId");
         }
         ActActivity actTmp = new ActActivity();
         actTmp.setActivityId(activityId);
         actTmp.setActGroupId(actGroupId);
         actTmp.setQuaId((String) tmp.get("quaId"));
         actTmp.setActivityName((String) tmp.get("activityName"));
-        actTmp.setStatus(ActivityConstants.ACTIVITY_STATUS.INIT.getValue());
-        actTmp.setCycleUnit(Byte.parseByte((String) tmp.get("cycleUnit"))); // 週期類型：１－小時，２－天，３－周，４－月
-        actTmp.setCycleMax(((int) tmp.get("cycleMax"))); // 週期內最大量（庫存）
-        actTmp.setUserCycleMax(((int) tmp.get("userCycleMax"))); // 週期內用戶最大量
+        actTmp.setStatus(ActivityConstants.ACTIVITY_STATUS.INIT.getValue()); //TODO
+        actTmp.setActivityCycle(((Number)tmp.get("activityCycle")).intValue());
+        actTmp.setCycleUnit(((Number) tmp.get("cycleUnit")).byteValue()); // 週期類型：１－小時，２－天，３－周，４－月
+        actTmp.setCycleMax(((Number) tmp.get("cycleMax")).intValue()); // 週期內最大量（庫存）
+        actTmp.setUserCycleMax(((Number) tmp.get("userCycleMax")).intValue()); // 週期內用戶最大量
+        actTmp.setUserMax(((Number)tmp.get("userMax")).intValue());
         actTmp.setSeqNumber(seqNumber);
         subActivities.add(actTmp);
+        
+        ActActivityConfig config = new ActActivityConfig();
+        config.setObjectName(ActActivity.class.getName().toString());
+        config.setObjectId(activityId);
+        config.setMetaKey("buttonText");
+        config.setMetaValue((String) tmp.get("buttonText"));
+        configs.add(config);
         JSONArray productsJArray = (JSONArray) tmp.get("productList");
         for (Object product : productsJArray) {
           Map prdTmp = (Map) product;
-          float drawRate = Float.valueOf(prdTmp.get("drawRate").toString());
-          String productId = (String) prdTmp.get("productId");
 
           ActActivityGift gift = new ActActivityGift();
+          if(opType.equals(OP_TYPE.UPDATE)){
+            gift.setId((String)tmp.get("productKey"));
+          }
           gift.setActivityId(activityId);
-          gift.setProductId(productId);
-          gift.setDrawRate(drawRate);
+          gift.setProductId((String) prdTmp.get("productId"));
+          gift.setDrawRate(((Number)prdTmp.get("drawRate")).floatValue());
           gifts.add(gift);
         }
       }
@@ -800,64 +876,68 @@ public class ActivityController4OP {
     group.setActGroupId(actGroupId);
     group.setQuaGroupId(quaGroupIdStr);
     group.setActGroupName(actGroupNameStr);
-    group.setActivityType((byte)activityTypeVar);
+    group.setActivityType((byte) activityTypeVar);
     group.setOnlineTime(StringUtils.isEmpty(onlineTimeStr) ? null
-      : DateTimeUtils.toDate(onlineTimeStr, DateTimeUtils.Pattern.CMBCHINA_FORMATE_TIME));
+        : DateTimeUtils.toDate(onlineTimeStr, DateTimeUtils.Pattern.CMBCHINA_FORMATE_TIME));
     group.setOfflineTime(StringUtils.isEmpty(offlineTimeStr) ? null
-      : DateTimeUtils.toDate(offlineTimeStr, DateTimeUtils.Pattern.CMBCHINA_FORMATE_TIME));
+        : DateTimeUtils.toDate(offlineTimeStr, DateTimeUtils.Pattern.CMBCHINA_FORMATE_TIME));
     group.setStartTime(StringUtils.isEmpty(startTimeStr) ? null
-      : DateTimeUtils.toDate(startTimeStr, DateTimeUtils.Pattern.CMBCHINA_FORMATE_TIME));
+        : DateTimeUtils.toDate(startTimeStr, DateTimeUtils.Pattern.CMBCHINA_FORMATE_TIME));
     group.setEndTime(StringUtils.isEmpty(endTimeStr) ? null
-      : DateTimeUtils.toDate(endTimeStr, DateTimeUtils.Pattern.CMBCHINA_FORMATE_TIME));
+        : DateTimeUtils.toDate(endTimeStr, DateTimeUtils.Pattern.CMBCHINA_FORMATE_TIME));
     group.setChannel((byte) 1);
     group.setDescription(descriptionStr);
     group.setStatus(ActivityConstants.ACTIVITY_STATUS.INIT.getValue());
     group.setSeqNumber(seqNumber);
-    group.setSubActivityRelation((byte)subActivityRelationVar);
+    group.setSubActivityRelation((byte) subActivityRelationVar);
     group.setPicUrl(picUrlStr);
     group.setCommitUserId(commitUserIdStr);
     group.setCommitUserName(commitUserNameStr);
     group.setCommitTime(DateTimeUtils.now());
 
 
-    ActBusiContext context = this.getTransContext(null, token);
+//    ActBusiContext context = this.getTransContext(null, token);
+    ActBusiContext context = new  ActBusiContext();//TODO this.getTransContext(null, token);
 
     try {
-      switch (opType){
-        case CREATE:{
-          activityService.addActivity(context, group, subActivities, recommends, areas, gifts, null);
+      switch (opType) {
+        case CREATE: {
+          activityService.addActivity(context, group, subActivities, recommends, areas, gifts,
+              configs);
           break;
         }
-        case UPDATE:{
+        case UPDATE: {
           activityService.updateActivity(context, group, subActivities, recommends, areas, gifts,
-            null);
+              configs);
           break;
         }
         default: {
           break;
         }
       }
-//      log.info(JSONObject.toJSONString(group));
+      // log.info(JSONObject.toJSONString(group));
     } catch (BusinessException e) {
       e.printStackTrace();
       log.error(String.format("error:%s", e.getLocalizedMessage()));
+      throw e;
     }
     return result;
   }
 
-  //TODO AOP
-  private ActBusiContext getTransContext(HttpSession session, String token) throws BusinessException{
+  // TODO AOP
+  private ActBusiContext getTransContext(HttpSession session, String token)
+      throws BusinessException {
     ActBusiContext context = new ActBusiContext();
 
     if (token == null) {
-      if(session == null){
-        throw new BusinessException("", new NullPointerException().getMessage()); //TODO
+      if (session == null) {
+        throw new BusinessException("", new NullPointerException().getMessage()); // TODO
       }
       token = (String) session.getAttribute("token");
     }
     AuthUser user = authorityService.getUserByToken(token);
 
-    context.setRequestSeqNo(KeyGenerator.uuid()); //TODO
+    context.setRequestSeqNo(KeyGenerator.uuid()); // TODO
     context.setOperatorUserId(user.getUserId());
     context.setOperatorUserName(user.getUserName());
     context.setOperatorDeptId(user.getDeptId());

@@ -8,6 +8,8 @@ import com.cmbchina.activity.busi.common.service.AuthorityService;
 import com.cmbchina.activity.busi.common.service.ComMessageService;
 import com.cmbchina.commons.bean.BusinessException;
 import com.cmbchina.commons.util.DateTimeUtils;
+
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -40,19 +43,27 @@ public class MessageController {
   private AuthorityService authorityService;
 
 //  @RequestMapping(value = "getUserNotice", method = RequestMethod.POST)
-  @RequestMapping(value = "getUserNotice", method = RequestMethod.GET)
+  @RequestMapping(value = "getUserNoticeList", method = RequestMethod.GET)
   @ResponseBody
-  public List<Object> getUserNotice(String token, HttpServletRequest request)throws BusinessException{
+  public List<Object> getUserNotice(String userId, HttpServletRequest request)throws BusinessException{
+	  
+	  if(StringUtils.isEmpty(userId)){
+		  return null;
+	  }
     ComBusiContext context = new ComBusiContext();
     context.setOperatorUserId(request.getRemoteUser()); //TODO
     context.setRequestSeqNo("MSG"+ DateTimeUtils.now());
 
-    AuthUser user = authorityService.getUserByToken(token);
-    if(user==null){
-      throw new BusinessException("","用户未登录");
-    }
+//    log.info("token:{}", token);
+//    AuthUser user = authorityService.getUserByToken(token);
+//    if(user==null){
+//      throw new BusinessException("","用户未登录");
+//    }
 
-    String userId = user.getUserId();
+//    String userId = user.getUserId();
+    if(log.isDebugEnabled()){
+    	log.debug("userId", userId);
+    }
     List result = comMessageService.getUserNotice(context, userId);
     return result;
   }
@@ -86,4 +97,30 @@ public class MessageController {
     result = comMessageService.addMessage(context, message);
     return result;
   }
+  
+//@RequestMapping(value = "getUserNotice", method = RequestMethod.POST)
+@RequestMapping(value = "getUserNotice", method = RequestMethod.GET)
+@ResponseBody
+public List<Object> getUserNoticeSum(String userId, HttpServletRequest request)throws BusinessException{
+	  
+	  if(StringUtils.isEmpty(userId)){
+		  return null;
+	  }
+  ComBusiContext context = new ComBusiContext();
+  context.setOperatorUserId(request.getRemoteUser()); //TODO
+  context.setRequestSeqNo("MSG"+ DateTimeUtils.now());
+
+//  log.info("token:{}", token);
+//  AuthUser user = authorityService.getUserByToken(token);
+//  if(user==null){
+//    throw new BusinessException("","用户未登录");
+//  }
+
+//  String userId = user.getUserId();
+  if(log.isDebugEnabled()){
+  	log.debug("userId", userId);
+  }
+  List result = comMessageService.getUserNoticeSum(context, userId);
+  return result;
+}
 }

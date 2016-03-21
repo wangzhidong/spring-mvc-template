@@ -8,12 +8,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by wangtingbang on 16-2-17.
@@ -59,5 +63,34 @@ public class ProductController4External {
       return null;
     }
     return products;
+  }
+
+  /**
+   * queryProductUsages
+   */
+  @RequestMapping(value = "queryProductUsages",method = RequestMethod.POST)
+  @ResponseBody
+  public Map queryProductUsages(@RequestBody HashMap req){
+
+    Map param =(Map) req.get("param");
+    // for obj:param
+    // productId = obj;
+
+    return null; // {$productId:{$activityId,$activityName, $activityStatus}}
+
+  }
+
+  /**
+   * queryProductUsages
+   */
+//  @RequestMapping(value = "queryProductUsages",method = RequestMethod.POST)
+//  @ResponseBody
+  public Map queryProductUsages(@RequestBody ArrayList req){
+
+    // for obj:req
+    // productId = obj;
+
+    return null; // {$productId:{$activityId,$activityName, $activityStatus}}
+
   }
 }

@@ -1,7 +1,13 @@
 package com.cmbchina.activity.tran.restful.test;
 
+import com.cmbchina.activity.tran.restful.BasicController;
+import com.cmbchina.activity.tran.restful.product.controller.ProductController4External;
 import com.cmbchina.commons.bean.BusinessException;
+import com.esotericsoftware.minlog.Log;
 import com.google.common.collect.Lists;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -14,8 +20,10 @@ import java.util.*;
  */
 @Controller
 @RequestMapping(value="test")
-public class TestController {
+public class TestController{// extends BasicController{
 
+  private static final Logger log = LoggerFactory.getLogger(TestController.class);
+	  
   @RequestMapping(value="greeting", method = RequestMethod.GET)
   @ResponseBody
   public String greeting(String name){
@@ -63,7 +71,9 @@ public class TestController {
   @ResponseBody
   public Object bizException( int flag ) throws BusinessException {
     if(flag == 0){
-      throw new BusinessException("100100");
+      BusinessException e = new BusinessException("100100", "flag == 0, throw new BusinessException");
+      log.error("{}",e);
+      throw e;
     }
     else if(flag == -1){
       return null;

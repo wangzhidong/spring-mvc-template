@@ -60,10 +60,10 @@ public class ProductController4OP {
       return null;
     }
 
-    List<ExternalProduct> products = externalProductService.listAvailableProduct(
-            user.getAreaCode(), user.getDeptId(), page,limit);
+//    List<ExternalProduct> products = externalProductService.listAvailableProduct(
+//            user.getAreaCode(), user.getDeptId(), page,limit);
 
-    return products;
+    return null;//products;
   }
 
   /**

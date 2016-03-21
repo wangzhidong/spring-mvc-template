@@ -4,6 +4,7 @@ import com.cmbchina.activity.busi.act.service.ActivityService;
 import com.cmbchina.activity.busi.common.dto.ComBusiContext;
 import com.cmbchina.activity.busi.external.service.ExternalQualificationService;
 import com.cmbchina.commons.bean.BusinessException;
+import com.cmbchina.commons.bean.exception.BusinessExceptionDic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +58,7 @@ public class QualificationController4External {
   @ResponseBody
   public Map queryQualificationUsages(@RequestBody HashMap req) throws Exception{
     if(req == null || req.get("param") == null){
-      throw new IllegalArgumentException();
+      throw BusinessExceptionDic.EX_GNR_NULL_PARAM;
     }
     log.info("request:{}", req);
 
@@ -66,7 +67,7 @@ public class QualificationController4External {
     String quaGroupId = (String)param.get("quaGroupId");
     String quaId = (String) param.get("quaId");
     if(quaGroupId == null && quaId == null){
-      throw new IllegalArgumentException();
+      throw BusinessExceptionDic.EX_GNR_ILLEGAL_PARAM;
     }
     
     try {

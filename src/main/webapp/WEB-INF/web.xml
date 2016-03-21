@@ -8,13 +8,6 @@
 
     <context-param>
         <param-name>contextConfigLocation</param-name>
-        <!--<param-value>-->
-            <!--classpath*/conf/trans/spring/dubbo-consumer-activity.xml-->
-            <!--classpath*/conf/trans/spring/dubbo-consumer-common.xml-->
-            <!--classpath*/conf/trans/spring/dubbo-consumer-external.xml-->
-            <!--classpath*:conf/trans/spring/applicationContext-min.xml-->
-            <!--classpath*:conf/trans/spring/applicationContext-mvc.xml-->
-        <!--</param-value>-->
         <param-value>
             classpath*:conf/trans/spring/applicationContext.xml
         </param-value>
@@ -50,6 +43,11 @@
             <param-name>contextConfigLocation</param-name>
             <param-value>classpath:conf/trans/spring/applicationContext.xml</param-value>
         </init-param>
+        <!--<init-param>-->
+        <!--&lt;!&ndash; 取消其自动注册的异常解析器 &ndash;&gt;-->
+            <!--<param-name>detectAllHandlerExceptionResolvers</param-name>-->
+            <!--<param-value>false</param-value>-->
+        <!--</init-param>-->
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>

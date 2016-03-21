@@ -1,6 +1,7 @@
 package com.cmbchina.activity.tran.support.mvc;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.FloatCodec;
 import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.serializer.SimpleDateFormatSerializer;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
@@ -22,6 +23,7 @@ public class TranFastJsonHttpMessageConverter extends FastJsonHttpMessageConvert
     OutputStream out = outputMessage.getBody();
     SerializeConfig sc = new SerializeConfig();
     sc.put(Date.class, new SimpleDateFormatSerializer("yyyy/MM/dd HH:mm:ss"));
+//    sc.put(Float.class, "#.#");
 //    String text = JSON.toJSONString(obj, super.getFeatures());
     String text = JSON.toJSONString(obj, sc, super.getFeatures());
     byte[] bytes = text.getBytes(super.getCharset());

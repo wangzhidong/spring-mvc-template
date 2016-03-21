@@ -1,16 +1,18 @@
 package com.cmbchina.activity.tran.restful.common.controller;
 
-import com.cmbchina.activity.busi.common.service.ComDepartmentService;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.List;
+import com.cmbchina.activity.busi.common.service.ComDepartmentService;
 
 /**
  * Created by wangtingbang on 16/1/11.
@@ -25,11 +27,12 @@ public class CommonDepartmentController {
   @Autowired
   private ComDepartmentService comDepartmentService;
 
-  @RequestMapping(value = "{role}/listDepartments",
-      method = {RequestMethod.POST, RequestMethod.GET})
+  @RequestMapping(value = "listDepartments",
+//      method = {RequestMethod.POST, RequestMethod.GET})
+    method = RequestMethod.GET)
   @ResponseBody
-  public List listDepartments(@PathVariable("role") String role, int page, int limit) {
-    log.info("CommonDepartmentController.listDepartments call:{},{},{}", role, page, limit);
+  public List listDepartments(int page, int limit, HttpServletRequest request) throws Exception{
+    log.info("CommonDepartmentController.listDepartments call:{},{}", page, limit);
     List result = comDepartmentService.listDepartments(page, limit);
     return result;
   }

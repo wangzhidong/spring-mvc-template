@@ -54,7 +54,10 @@ public class ActivityController4H5 {
    * @param customerId
    * @return
    */
+  @RequestMapping(value = "getActivityInfo4H5Draw", method = {RequestMethod.GET, RequestMethod.POST})
+  @ResponseBody
   public String getActivityInfo4H5Draw(String activityId, String customerId) {
+
     return null;
   }
 
@@ -65,7 +68,10 @@ public class ActivityController4H5 {
    * @param customerId
    * @return
    */
+  @RequestMapping(value = "getActivityInfo4H5Comm", method = {RequestMethod.GET, RequestMethod.POST})
+  @ResponseBody
   public String getActivityInfo4H5Comm(String activityId, String customerId) {
+
     return null;
   }
 

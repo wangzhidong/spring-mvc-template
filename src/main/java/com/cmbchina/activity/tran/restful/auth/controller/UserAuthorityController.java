@@ -50,35 +50,42 @@ public class UserAuthorityController {
 
   @RequestMapping(value = "userLogin", method = RequestMethod.POST)
   @ResponseBody
-  public Map userLogin(@RequestBody HashMap user, HttpServletRequest request) {
+  public Map userLogin(@RequestBody HashMap user, HttpServletRequest request) throws Exception{
 
-    log.info("user:", JSONObject.toJSONString(user));
-//    String loginName = user.getLoginName();
-//    String password = user.getPassword();
-    
+    if(request == null){
+      //TODO
+      throw new Exception();
+    }
+    String requestSessionToken = (String)request.getSession().getAttribute("token");
     String loginName = (String)((Map)user.get("param")).get("loginName");
     String password = (String)((Map)user.get("param")).get("password");
-    log.info("user login:", loginName);
     String remoteHost = request.getRemoteHost();
-
+    
+    log.info("user[{}] login @ {}", loginName, remoteHost);
     try {
+//      String existedToken = authorityService.getTokenByLoginName(loginName);
+      String existedToken = requestSessionToken;
+      if (!StringUtils.isEmpty(existedToken)) {
+        log.debug("existed token for logged in user:{}", loginName);
+        AuthUser existedUser = authorityService.getUserByToken(existedToken);
+        if(existedUser != null) {
+          Map response = new HashMap();
+          response.put("token", existedToken);
+          response.put("roleId", "" + existedUser.getRoleId());
+          response.put("deptId", "" + existedUser.getDeptId());
+          response.put("deptName", "" + existedUser.getDeptName());
+          response.put("userId", existedUser.getUserId());
+          return response;
+        }
+        log.info("用户[{}]登录session失效，继续执行以重新登录", loginName);
+      }
+
       Map loginResult = comUserService.userLogin(loginName, password);
       if (loginResult == null) {
         log.error("无效用户:{}", loginName);
         return null;
       }
-      String existedToken = authorityService.getTokenByLoginName(loginName);
-      if (!StringUtils.isEmpty(existedToken)) {
-        log.debug("existed token for logged in user:{}", loginName);
-        AuthUser existedUser = authorityService.getUserByToken(existedToken);
-        Map response = new HashMap();
-        response.put("token", existedToken);
-        response.put("roleId", "" + existedUser.getRoleId());
-        response.put("deptId", "" + existedUser.getDeptId());
-        response.put("deptName", "" + existedUser.getDeptName());
-        response.put("userId", existedUser.getUserId());
-        return response;
-      }
+
       ComUser comUser = (ComUser) (loginResult.get("user"));
       String token = (String) (loginResult.get("token"));
 
@@ -104,6 +111,7 @@ public class UserAuthorityController {
       response.put("deptId", "" + authUser.getDeptId());
       response.put("deptName", "" + authUser.getDeptName());
       response.put("userName", authUser.getUserName());
+      response.put("userId", authUser.getUserId());
       return response;
     } catch (BusinessException e) {
       log.error("error:{}", e);
@@ -140,23 +148,21 @@ public class UserAuthorityController {
   @RequestMapping(value = "userLoginTest", method = RequestMethod.GET)
   @ResponseBody
   public String userLoginTest(String userName, String password, HttpServletRequest request,
-      Model model, HttpSession session) {
+      Model model, HttpSession session) throws Exception{
 
     log.info("session:{}", session.getAttribute("token"));
-//    UserAuthRequest user = new UserAuthRequest();
-//    user.setLoginName(userName);
-//    user.setPassword(password);
     HashMap req = new HashMap();
-    req.put("loginName", userName);
-    req.put("password", password);
+    HashMap param = new HashMap();
+    param.put("loginName", userName);
+    param.put("password", password);
+    req.put("param",param);
+    
     Map result = this.userLogin(req, request);
-//    Map result = this.userLogin(req);
     if (result == null) {
       return null;
     }
     String token = (String) result.get("token");
     session.setAttribute("token", token);
-    // return token;
     return JSONObject.toJSONString(result);
   }
 

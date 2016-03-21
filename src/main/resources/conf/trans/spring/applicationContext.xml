@@ -24,23 +24,15 @@
             <!--<bean class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter"></bean>-->
             <!--TODO-->
             <bean class="com.cmbchina.activity.tran.support.mvc.TranFastJsonHttpMessageConverter"></bean>
-
-            <!--<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">-->
-                <!--<property name="objectMapper">-->
-                    <!--<bean class="com.fasterxml.jackson.databind.ObjectMapper">-->
-                        <!--<property name="dateFormat">-->
-                        <!--<bean class="java.text.SimpleDateFormat">-->
-                                <!--<constructor-arg type="java.lang.String" value="yyyy-MM-dd HH:mm:ss"/>-->
-                            <!--</bean>-->
-                        <!--</property>-->
-                    <!--</bean>-->
-                <!--</property>-->
-            <!--</bean>-->
         </mvc:message-converters>
     </mvc:annotation-driven>
     <mvc:view-controller path="/" view-name="common/index"/>
 
-    <!--<bean id="exceptionHandler" class="com.cmbchina.activity.tran.support.mvc.CommonExceptionHandler"/>-->
+    <mvc:interceptors>
+        <bean class="com.cmbchina.activity.tran.support.mvc.SessionTokenInterceptor" />
+    </mvc:interceptors>
+
+    <bean id="exceptionHandler" class="com.cmbchina.activity.tran.support.mvc.CommonExceptionHandler"/>
     <bean id="contentNegotiationManager"
           class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
         <property name="ignoreAcceptHeader" value="true"/>
@@ -52,7 +44,6 @@
             </value>
         </property>
     </bean>
-
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
         <property name="prefix" value="/WEB-INF/page/"/>
@@ -60,11 +51,18 @@
         <property name="order" value="1"/>
     </bean>
 
+    <!-- <bean id="handlerExceptionResolver" class="com.cmbchina.activity.tran.support.mvc.AnnotationHandlerMethodExceptionResolver"> -->
+    <!--<bean id="exceptionHandler" class="com.cmbchina.activity.tran.support.mvc.AnnotationHandlerMethodExceptionResolver">-->
+        <!--<property name="defaultErrorView" value="exception"/>-->
+        <!--<property name="messageConverters" ref="messageConverters"/> -->
+
+    <!--</bean>-->
+
     <dubbo:application name="busi-activity-service-consumer" owner="O2O-developer"
                        organization="cmbchina"/>
 
     <dubbo:registry address="zookeeper://127.0.0.1:2181"/>
-    <!--<dubbo:registry address="zookeeper://192.168.20.3:2181"/>-->
+    <!--<dubbo:registry address="zookeeper://172.16.0.173:2181"/>-->
     <dubbo:protocol name="dubbo" serialization="kryo"/>
 
     <dubbo:annotation package="com.cmbchina.activity.tran.restful.*"/>
