@@ -2,9 +2,18 @@ package com.cmbchina.activity.tran.pojo;
 
 public class CommonContext {
 
+  private String threadId;
   private String seqNo;
   private String userId;
   private String userName;
+
+  public String getThreadId() {
+    return this.threadId;
+  }
+
+  public void setThreadId(String threadId) {
+    this.threadId = threadId;
+  }
 
   public String getSeqNo() {
     return seqNo;

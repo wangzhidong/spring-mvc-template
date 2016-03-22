@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.aspectj.lang.annotation.Around;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.cmbchina.activity.tran.aop.ContextResolver;
 import com.cmbchina.activity.tran.exception.BusinessException;
 import com.cmbchina.activity.tran.restful.BasicController;
 import com.google.common.collect.Lists;
@@ -28,6 +30,7 @@ import com.google.common.collect.Lists;
 
 @Controller
 @RequestMapping(value = "common/user")
+@Scope("prototype")
 public class CommonUserController extends BasicController {
 
   private static final Logger log = LoggerFactory.getLogger(CommonUserController.class);
@@ -181,7 +184,7 @@ public class CommonUserController extends BasicController {
   @RequestMapping(value = "test", method = RequestMethod.GET)
   // TODO
   @ResponseBody
-  @Around("aspectjMethod()")
+  @ContextResolver
   public List test(HttpServletRequest request) throws BusinessException {
     // TODO
     String token = (String) request.getSession().getAttribute("token");
