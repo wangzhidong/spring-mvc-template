@@ -1,30 +1,26 @@
 package com.cmbchina.activity.tran.restful.common.controller;
 
-import com.alibaba.fastjson.JSONArray;
-import com.cmbchina.activity.busi.common.constant.UserConstants;
-import com.cmbchina.activity.busi.common.dto.AuthUser;
-import com.cmbchina.activity.busi.common.dto.ComArea;
-import com.cmbchina.activity.busi.common.dto.ComBusiContext;
-import com.cmbchina.activity.busi.common.dto.ComUser;
-import com.cmbchina.activity.busi.common.service.AuthorityService;
-import com.cmbchina.activity.busi.common.service.ComUserService;
-import com.cmbchina.commons.bean.BusinessException;
-import com.cmbchina.commons.bean.exception.BusinessExceptionDic;
-import com.cmbchina.commons.util.DateTimeUtils;
-import com.google.common.collect.Lists;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.crypto.hash.Hash;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.aspectj.lang.annotation.Around;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.cmbchina.activity.tran.exception.BusinessException;
+import com.cmbchina.activity.tran.restful.BasicController;
+import com.google.common.collect.Lists;
 
 /**
  * Created by wangtingbang on 16/1/13.
@@ -32,15 +28,11 @@ import java.util.Map;
 
 @Controller
 @RequestMapping(value = "common/user")
-public class CommonUserController {
+public class CommonUserController extends BasicController {
 
   private static final Logger log = LoggerFactory.getLogger(CommonUserController.class);
 
-  @Autowired
-  private ComUserService comUserService;
-
-  @Autowired
-  private AuthorityService authorityService;
+  
 
 
   public enum OP_TYPE {
@@ -79,14 +71,7 @@ public class CommonUserController {
     int limit = 10;
     String deptId = (String) param.get("deptId");
     JSONArray roleListJArr = (JSONArray) param.get("roleList");
-    // Byte[] roleList = new Byte[roleListStr.size()];
-    // roleListStr.toArray(roleList);
-    ComBusiContext commonContext = new ComBusiContext();
-    commonContext.setRequestSeqNo("EXTR" + DateTimeUtils.now()); // TODO seqNo-gen
 
-    /**
-     * TODO
-     */
     String remoteAddr = request.getRemoteAddr();
     String remoteHost = request.getRemoteHost();
     String remoteUser = request.getRemoteUser();
@@ -96,43 +81,12 @@ public class CommonUserController {
     List<Byte> role_s = new ArrayList();// Lists.newArrayList(roleList);
     for (int idx = 0; idx < roleListJArr.size(); idx++) {
       byte var = ((Number) roleListJArr.get(idx)).byteValue();
-      // role_s.add((Number)roleListJArr.get(idx));
       role_s.add(var);
     }
 
-    List<Map> result = comUserService.listUserByDept(commonContext, deptId, role_s);
-
-    // if (users == null || users.size() == 0) {
-    // return null;
-    // }
-    //
-    // List<Map> result = new ArrayList<Map>();
-    // for (Map user : users) {
-    // Map<String, Object> map = new HashMap<String, Object>();
-    // map.put("userId", user.get("userId"));
-    // map.put("userName", user.get("userName"));
-    // map.put("roleId", user.get("roleId"));
-    //
-    // result.add(map);
-    // }
-
+    List<Map> result = null;
     return result;
   }
-
-  /**
-   * 部门人员列表
-   * 
-   * @param deptId
-   * @param page
-   * @param limit
-   * @return
-   */
-  // @RequestMapping(value = "listUsersByDept", method = RequestMethod.GET)
-  // @ResponseBody
-  // public Object listUsersByDept(String deptId, int page, int limit){
-  // List roles = Lists.newArrayList(1,2,3);
-  // return comUserService.listUserByDept(null,deptId,roles,page,limit);
-  // }
 
   /**
    * 用户添加
@@ -143,8 +97,7 @@ public class CommonUserController {
    */
   @RequestMapping(value = "addUser", method = RequestMethod.POST)
   @ResponseBody
-  public int addUser(@RequestBody HashMap req, HttpServletRequest request)
-      throws BusinessException {
+  public int addUser(@RequestBody HashMap req, HttpServletRequest request) throws BusinessException {
 
     String token = (String) request.getSession().getAttribute("token");
     return this.proccessWrite(req, OP_TYPE.CREATE, token);
@@ -170,36 +123,19 @@ public class CommonUserController {
   }
 
   private int proccessWrite(Map req, OP_TYPE opType, String token) throws BusinessException {
+    log.info("request body:{}", req);
     Map param = (Map) req.get("param");
 
-    ComUser user = new ComUser();
+    int result = 0;
 
-
-    AuthUser opUser = authorityService.getUserByToken(token);
-
-    // TODO
-    // if(opUser.getRoleId().equals(UserConstants.USER_ROLE_ID.ADMIN.getValue())) {
-    // user.setDeptId((String) param.get("deptId"));
-    // user.setDeptName((String) param.get("deptName"));
-    // user.setRoleId(((Number) param.get("roleId")).shortValue()); //TOOD
-    // user.setApproverId((String) param.get("approverId"));
-    // user.setArea((String) param.get("area"));
-    // }
-    user.setLoginName((String) param.get("loginName"));
-    user.setPassword((String) param.get("password"));
-    user.setUserName((String) param.get("userName"));
-    user.setPhone((String) param.get("phone"));
-    user.setEmail((String) param.get("email"));
-
-
-    int result = -1;
     switch (opType) {
       case CREATE:
-        result = comUserService.addUser(null, user); // TODO
+        result = -1;// comUserService.addUser(null, user); // TODO
         break;
       case UPDATE:
-        user.setUserId((String) param.get("userId"));
-        result = comUserService.updateUser(null, user);
+        // user.setUserId((String) param.get("userId"));
+        // String oldPass = (String) param.get("oldPassword");
+        result = -1;// comUserService.updateUser(context, user, oldPass);
         break;
     }
     return result;
@@ -211,64 +147,50 @@ public class CommonUserController {
    * @return
    * @throws BusinessException
    */
-  @RequestMapping(value = "listUsers", method = RequestMethod.GET) // TODO
+  @RequestMapping(value = "listUsers", method = RequestMethod.GET)
+  // TODO
   @ResponseBody
+  @Around("aspectjMethod()")
   public List listUsers(int page, int limit, HttpServletRequest request) throws BusinessException {
     // TODO
-    log.info("page:{}, limit:{}", page, limit);
-    List result = comUserService.listUsers(null, page, limit);
+    String token = (String) request.getSession().getAttribute("token");
+    log.info("page:{}, limit:{}, token:{}", page, limit, token);
+    List result = null;// comUserService.listUsers(null, page, limit);
     
-    //TODO hide password
+    log.info("context value:{}", JSONObject.toJSONString(this.context));
 
-    return result;
+//    return result;
+    return Lists.newArrayList(JSONObject.toJSONString(this.context));
   }
 
-  /**
-   * 用户详情
-   * 
-   * @param userId
-   * @return
-   * @throws BusinessException
-   */
-  @RequestMapping(value = "getUserInfo", method = RequestMethod.GET) // TODO to be remove
+//  public void initContext(AuthUser user) {
+//
+//    if(user == null){
+//      log.error("init context error, user is null");
+//    }
+//    if(this.context==null){
+//      this.context = new CommonContext();
+//    }
+//    this.context.setSeqNo(user.getSeqNo());
+//    this.context.setUserId(user.getUserId());
+//    this.context.setUserName(user.getUserName());
+//    
+//    log.info("init context:{}", JSONObject.toJSONString(this.context));
+//  }
+  
+  @RequestMapping(value = "test", method = RequestMethod.GET)
+  // TODO
   @ResponseBody
-  public Object getUserInfo(String userId, HttpServletRequest request) throws BusinessException {
+  @Around("aspectjMethod()")
+  public List test(HttpServletRequest request) throws BusinessException {
+    // TODO
+    String token = (String) request.getSession().getAttribute("token");
+//    log.info("page:{}, limit:{}, token:{}", page, limit, token);
+    List result = null;// comUserService.listUsers(null, page, limit);
+    
+    log.info("context value:{}", JSONObject.toJSONString(this.context));
 
-    if (StringUtils.isEmpty(userId)) {
-      throw BusinessExceptionDic.EX_GNR_NULL_PARAM;
-    }
-
-    ComUser user = comUserService.getUserInfo(null, userId); // TODO
-
-    if (user == null) {
-      throw BusinessExceptionDic.EX_GNR_DATA_NULL;
-    }
-
-    Map result = new HashMap();
-
-    result.put("approverName", user.getApproverName());
-    result.put("approverId", user.getApproverId());
-    result.put("userName", user.getUserName());
-    result.put("deptId", user.getDeptId());
-    result.put("deptName", user.getDeptName());
-    result.put("loginName", user.getLoginName());
-    result.put("roleId", user.getRoleId());
-    result.put("area", user.getArea());
-    result.put("phone", user.getPhone());
-    result.put("email", user.getEmail());
-
-    if (result == null) {
-      log.error("user is null for userId:", userId);
-      throw BusinessExceptionDic.EX_GNR_DATA_NULL;
-    }
-    return result;
-  }
-
-  @RequestMapping(value = "deleteUser", method = RequestMethod.GET) // TODO
-  @ResponseBody
-  public int deleteUser(String userId, HttpServletRequest request) throws BusinessException {
-    log.info("deleteUser:{}, {}", userId, request); // TODO
-    int result = comUserService.deleteUser(null, userId);
-    return result;
+//    return result;
+    return Lists.newArrayList(JSONObject.toJSONString(this.context));
   }
 }

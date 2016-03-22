@@ -1,16 +1,25 @@
 package com.cmbchina.activity.tran.restful;
 
-import org.springframework.web.bind.annotation.ExceptionHandler;
-
-import javax.servlet.http.HttpServletRequest;
+import com.cmbchina.activity.tran.pojo.AuthUser;
+import com.cmbchina.activity.tran.pojo.CommonContext;
 
 /**
  * Created by wangtingbang on 16/3/19.
  */
 public class BasicController {
+  protected CommonContext context;
 
-  @ExceptionHandler
-  public String exception(HttpServletRequest request, Exception exception){
-    return exception.getMessage();
+  public void initContext(AuthUser user){
+    if(user == null){
+      return;
+    }
+
+    if(context == null){
+      context = new CommonContext();
+    }
+    this.context.setSeqNo(user.getSeqNo());
+    this.context.setUserId(user.getUserId());
+    this.context.setUserName(user.getUserName());
   }
+
 }

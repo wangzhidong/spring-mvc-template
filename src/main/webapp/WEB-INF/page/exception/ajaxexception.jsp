@@ -1,9 +1,9 @@
 <%-- <%@page import="com.jq.p2p.op.support.mvc.OpApiCode"%> --%>
-<%@page import="com.cmbchina.commons.util.JsonUtil"%>
+<%@page import="com.alibaba.fastjson.JSONObject" %>
 <%@page import="java.util.Map"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="org.apache.commons.lang3.StringUtils"%>
-<%@page import="com.cmbchina.commons.bean.BusinessException"%>
+<%@page import="com.cmbchina.activity.tran.exception.BusinessException"%>
 <%@ page language="java" contentType="application/json; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%
@@ -16,10 +16,14 @@
 	  e = new BusinessException("999999");
 	}
 	Map m = new HashMap();
-	m.put("retCode", e.getCode());
-	if(StringUtils.isNotBlank(e.getMessage())){
-	  m.put("retMsg", e.getMessage());
+	m.put("code", e.getCode());
+	if(StringUtils.isNotBlank(e.getMessage())&&！StringUtils.isEmpty(e.getMessage())){
+	  m.put("message", e.getMessage());
+	  
+	}else{
+	  m.put("message", "未知错误");
 	}
-	String json = JsonUtil.toJson(m);
+	String json = JSONObject.toJSONString(m);
+	
 %>
 <%=json%>
