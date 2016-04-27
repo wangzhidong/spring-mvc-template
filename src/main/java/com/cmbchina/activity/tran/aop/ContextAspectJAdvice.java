@@ -33,7 +33,7 @@ public class ContextAspectJAdvice {
    * 
    * @param joinPoint
    */
-  @Before("aspectjMethod()")
+  //@Before("aspectjMethod()")
   public void beforeAdvice(JoinPoint joinPoint) {
     try {
       Object[] args = joinPoint.getArgs();

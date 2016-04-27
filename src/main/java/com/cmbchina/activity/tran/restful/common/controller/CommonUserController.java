@@ -15,7 +15,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.view.RedirectView;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -34,9 +36,6 @@ import com.google.common.collect.Lists;
 public class CommonUserController extends BasicController {
 
   private static final Logger log = LoggerFactory.getLogger(CommonUserController.class);
-
-  
-
 
   public enum OP_TYPE {
     CREATE((byte) 1), UPDATE((byte) 2);
@@ -196,4 +195,25 @@ public class CommonUserController extends BasicController {
 //    return result;
     return Lists.newArrayList(JSONObject.toJSONString(this.context));
   }
+  
+  @RequestMapping(value = "redirect", method = RequestMethod.GET)
+  @ResponseBody
+  public RedirectView testRedirect(@RequestParam("param") String param){
+    RedirectView view = new RedirectView("http://www.baidu.com");
+    Map attr = new HashMap();
+    attr.put("param",param);
+    view.setAttributesMap(attr);
+    return view;//"redirect:http://www.baidu.com"+"&"+param;
+  }
+  
+  @RequestMapping(value = "redirect2", method = RequestMethod.GET)
+  
+  public String redirect2(@RequestParam("param") String param){
+    RedirectView view = new RedirectView("http://www.baidu.com");
+    Map attr = new HashMap();
+    attr.put("param",param);
+    view.setAttributesMap(attr);
+    return "redirect:http://www.baidu.com"+"/"+param;
+  }
+  
 }

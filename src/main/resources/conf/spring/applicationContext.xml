@@ -55,8 +55,8 @@
 	</bean>
 
 	<!-- CommonContext aop -->
-	<bean id="contextAspectJAdvice" class="com.cmbchina.activity.tran.aop.ContextAspectJAdvice" />
-
+<!-- 	<bean id="contextAspectJAdvice" class="com.cmbchina.activity.tran.aop.ContextAspectJAdvice" />
+ -->
 <!-- 	<aop:config>
 		<aop:aspect id="contextAspectJ" ref="contextAspectJAdvice">
 			<aop:pointcut id="commonUserControllera"
